@@ -1,219 +1,183 @@
-// ✅ Lista de animações (edita/expande à vontade)
-const ANIMS = [
-  {
-    id: 'balanca_ab',
-    name: 'Balança (A vs B)',
-    desc: 'Votação A/B com tilt e emojis. Lê via wordcloud.',
-    baseUrl: 'https://overlay-tug-of-war.vercel.app/',
-    tags: ['A/B', 'wordcloud', 'OBS'],
-    params: [
-      { key: 'title', label: 'Título', def: 'Balança de Decisão', placeholder: 'Balança de Decisão', type: 'text' },
-      { key: 'left', label: 'Texto A', def: 'Opção A', placeholder: 'Opção A', type: 'text' },
-      { key: 'right', label: 'Texto B', def: 'Opção B', placeholder: 'Opção B', type: 'text' },
-      { key: 'keyA', label: 'Voto A (tecla)', def: 'A', placeholder: 'A', type: 'text' },
-      { key: 'keyB', label: 'Voto B (tecla)', def: 'B', placeholder: 'B', type: 'text' },
-      { key: 'emojiMaxAt', label: 'Emoji máximo aos X votos', def: '40', placeholder: '40', type: 'number' },
-      { key: 'emojiMaxScale', label: 'Escala máxima do emoji', def: '2.1', placeholder: '2.1', type: 'number' },
-      { key: 'maxTilt', label: 'Inclinação máxima', def: '12', placeholder: '12', type: 'number' },
-    ],
-    build: (vals, domain) => {
-      const q = new URLSearchParams();
-      q.set('title', vals.title);
-      q.set('left', vals.left);
-      q.set('right', vals.right);
-      q.set('keyA', vals.keyA);
-      q.set('keyB', vals.keyB);
-      q.set('emojiMaxAt', vals.emojiMaxAt);
-      q.set('emojiMaxScale', vals.emojiMaxScale);
-      q.set('maxTilt', vals.maxTilt);
-      q.set('domain', domain);
-      return q;
-    }
-  },
-
-  {
-    id: 'poll4',
-    name: 'Poll 4 (A/B/C/D)',
-    desc: 'Pergunta com 4 opções e contadores.',
-    baseUrl: 'https://pool4.vercel.app/',
-    tags: ['A/B/C/D', 'wordcloud', 'OBS'],
-    params: [
-      { key: 'question', label: 'Pergunta', def: 'Qual a tua cor preferida?', placeholder: 'Qual a tua cor preferida?', type: 'text' },
-      { key: 'optA', label: 'Opção A', def: 'Azul', placeholder: 'Azul', type: 'text' },
-      { key: 'optB', label: 'Opção B', def: 'Vermelho', placeholder: 'Vermelho', type: 'text' },
-      { key: 'optC', label: 'Opção C', def: 'Verde', placeholder: 'Verde', type: 'text' },
-      { key: 'optD', label: 'Opção D', def: 'Amarelo', placeholder: 'Amarelo', type: 'text' },
-    ],
-    build: (vals, domain) => {
-      const q = new URLSearchParams();
-      q.set('question', vals.question);
-      q.set('optA', vals.optA);
-      q.set('optB', vals.optB);
-      q.set('optC', vals.optC);
-      q.set('optD', vals.optD);
-      q.set('domain', domain);
-      return q;
-    }
-  },
-
-  {
-    id: 'quiz2',
-    name: 'Quiz Relâmpago (2 opções)',
-    desc: 'Pergunta + 2 respostas em linha com contagem.',
-    baseUrl: 'https://quiz2.vercel.app/',
-    tags: ['2 opções', 'wordcloud', 'OBS'],
-    params: [
-      { key: 'question', label: 'Pergunta', def: 'Qual escolhes?', placeholder: 'Qual escolhes?', type: 'text' },
-      { key: 'a', label: 'Resposta A', def: 'Opção 1', placeholder: 'Opção 1', type: 'text' },
-      { key: 'b', label: 'Resposta B', def: 'Opção 2', placeholder: 'Opção 2', type: 'text' },
-      { key: 'keyA', label: 'Voto A (A)', def: 'A', placeholder: 'A', type: 'text' },
-      { key: 'keyB', label: 'Voto B (B)', def: 'B', placeholder: 'B', type: 'text' },
-    ],
-    build: (vals, domain) => {
-      const q = new URLSearchParams();
-      q.set('question', vals.question);
-      q.set('a', vals.a);
-      q.set('b', vals.b);
-      q.set('keyA', vals.keyA);
-      q.set('keyB', vals.keyB);
-      q.set('domain', domain);
-      return q;
-    }
-  },
-];
-
-// UI
-const $list = document.getElementById('list');
-const $domain = document.getElementById('domain');
-const $toast = document.getElementById('toast');
-
-function toast(msg){
-  $toast.textContent = msg;
-  $toast.classList.add('show');
-  setTimeout(()=> $toast.classList.remove('show'), 900);
+:root{
+  --bg:#0b0f1a;
+  --card: rgba(255,255,255,0.06);
+  --stroke: rgba(255,255,255,0.12);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.68);
+  --accent:#60a5fa;
+  --good:#22c55e;
+  --warn:#f59e0b;
 }
 
-function el(tag, attrs={}, children=[]){
-  const node = document.createElement(tag);
-  Object.entries(attrs).forEach(([k,v])=>{
-    if (k === 'class') node.className = v;
-    else if (k === 'html') node.innerHTML = v;
-    else node.setAttribute(k, v);
-  });
-  children.forEach(c => node.appendChild(c));
-  return node;
+*{ box-sizing:border-box }
+
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  background: radial-gradient(1200px 600px at 20% 10%, rgba(96,165,250,0.25), transparent),
+              radial-gradient(900px 500px at 90% 30%, rgba(245,158,11,0.18), transparent),
+              var(--bg);
+  color: var(--text);
+  min-height:100vh;
+  padding:28px;
 }
 
-function buildCard(anim){
-  const meta = el('div', { class: 'meta' }, [
-    el('h2', { html: anim.name }),
-    el('div', { class: 'desc', html: anim.desc }),
-    el('div', { class: 'tags' }, anim.tags.map(t => el('span', { class: 'tag', html: t })))
-  ]);
-
-  const form = el('div', { class: 'form' });
-  const inputs = {};
-
-  // Base URL editável
-  const baseField = el('div', { class: 'field' }, [
-    el('label', { html: 'Base URL (pode ser o teu Vercel)' }),
-    (() => {
-      const i = el('input', { type: 'text', value: anim.baseUrl });
-      inputs.__baseUrl = i;
-      return i;
-    })()
-  ]);
-  form.appendChild(baseField);
-
-  anim.params.forEach(p=>{
-    const field = el('div', { class: 'field' }, [
-      el('label', { html: p.label }),
-      (() => {
-        const i = el('input', {
-          type: p.type || 'text',
-          placeholder: p.placeholder || '',
-          value: p.def ?? ''
-        });
-        inputs[p.key] = i;
-        return i;
-      })()
-    ]);
-    form.appendChild(field);
-  });
-
-  const out = el('div', { class: 'out' }, [
-    el('div', { class: 'label', html: 'Link final (OBS Browser Source)' }),
-    el('div', { class: 'url', html: '' })
-  ]);
-
-  const outUrl = out.querySelector('.url');
-
-  function getVals(){
-    const vals = {};
-    anim.params.forEach(p => vals[p.key] = inputs[p.key].value ?? '');
-    return vals;
-  }
-
-  function compute(){
-    const domain = ($domain.value || '').trim() || 'http://localhost:3900';
-    const base = (inputs.__baseUrl.value || anim.baseUrl).trim();
-
-    const vals = getVals();
-    const q = anim.build(vals, domain);
-
-    const cleanBase = base.replace(/\?[^]*$/,'').replace(/\/$/,'');
-    const url = `${cleanBase}/?${q.toString()}`;
-    outUrl.textContent = url;
-    return url;
-  }
-
-  // Update em tempo real
-  Object.values(inputs).forEach(i => i.addEventListener('input', compute));
-  $domain.addEventListener('input', compute);
-
-  const btnCopy = el('button', { class: 'good', html: 'Copiar link' });
-  btnCopy.addEventListener('click', async ()=>{
-    const url = compute();
-    try{
-      await navigator.clipboard.writeText(url);
-      toast('Copiado ✅');
-    } catch {
-      const ta = document.createElement('textarea');
-      ta.value = url;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
-      toast('Copiado ✅');
-    }
-  });
-
-  const btnOpen = el('button', { class: 'primary', html: 'Abrir preview' });
-  btnOpen.addEventListener('click', ()=> window.open(compute(), '_blank'));
-
-  const btnReset = el('button', { html: 'Reset campos' });
-  btnReset.addEventListener('click', ()=>{
-    inputs.__baseUrl.value = anim.baseUrl;
-    anim.params.forEach(p => inputs[p.key].value = p.def ?? '');
-    compute();
-    toast('Reset feito');
-  });
-
-  const actions = el('div', { class: 'actions' }, [
-    el('div', { class: 'btns' }, [btnCopy, btnOpen, btnReset]),
-    el('div', { class: 'hint', html: 'Dica: no OBS ativa “Refresh cache of current page” quando estiveres a testar.' })
-  ]);
-
-  const right = el('div', {}, [form, actions, out]);
-  const row = el('div', { class:'row' }, [meta, right]);
-
-  const card = el('div', { class:'card' }, [row]);
-
-  // Primeira renderização
-  setTimeout(compute, 0);
-
-  return card;
+header{
+  max-width:1200px;
+  margin:0 auto 18px;
+  display:flex;
+  gap:16px;
+  align-items:flex-end;
+  justify-content:space-between;
+  flex-wrap:wrap;
 }
 
-// Render
-ANIMS.forEach(a => $list.appendChild(buildCard(a)));
+h1{ margin:0; font-size:28px; }
+.sub{ color:var(--muted); font-size:14px; margin-top:6px; }
+
+.pill{
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,0.22);
+  padding:10px 12px;
+  border-radius:999px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.pill input{
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  width:360px;
+}
+
+.wrap{
+  max-width:1200px;
+  margin:0 auto;
+  display:grid;
+  gap:14px;
+}
+
+.card{
+  border:1px solid var(--stroke);
+  background:linear-gradient(180deg, rgba(255,255,255,0.07), rgba(0,0,0,0.12));
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 22px 70px rgba(0,0,0,0.35);
+}
+
+.row{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  gap:14px;
+}
+
+@media (max-width:860px){
+  .row{ grid-template-columns:1fr; }
+}
+
+.meta h2{ margin:0 0 6px; font-size:18px; }
+.meta .desc{ font-size:13px; color:var(--muted); }
+
+.tags{ display:flex; gap:8px; flex-wrap:wrap; }
+.tag{
+  font-size:12px;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,0.18);
+  color:var(--muted);
+}
+
+.form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+@media (max-width:860px){
+  .form{ grid-template-columns:1fr; }
+}
+
+.field{
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,0.18);
+  border-radius:14px;
+  padding:10px 12px;
+}
+
+.field label{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+  display:block;
+}
+
+.field input{
+  width:100%;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:var(--text);
+}
+
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  justify-content:space-between;
+  margin-top:10px;
+}
+
+button{
+  border:1px solid var(--stroke);
+  background:rgba(0,0,0,0.22);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+button.primary{
+  border-color:rgba(96,165,250,0.45);
+  background:rgba(96,165,250,0.16);
+}
+
+button.good{
+  border-color:rgba(34,197,94,0.45);
+  background:rgba(34,197,94,0.14);
+}
+
+button.warn{
+  border-color:rgba(245,158,11,0.55);
+  background:rgba(245,158,11,0.14);
+}
+
+.out{
+  margin-top:10px;
+  border:1px dashed rgba(255,255,255,0.2);
+  background:rgba(0,0,0,0.18);
+  border-radius:14px;
+  padding:12px;
+}
+
+.out .label{ font-size:12px; color:var(--muted); }
+.out .url{ font-size:13px; word-break:break-all; }
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.65);
+  border:1px solid rgba(255,255,255,0.18);
+  padding:10px 12px;
+  border-radius:999px;
+  opacity:0;
+  transition:opacity .2s ease;
+}
+
+.toast.show{ opacity:1; }
