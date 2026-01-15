@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-PT">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Edição de Overlays (OBS)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Página de Testes de Overlays (OBS)</title>
+
   <style>
     :root{
       --bg:#0b0f1a;
@@ -12,40 +13,36 @@
       --text: rgba(255,255,255,0.92);
       --muted: rgba(255,255,255,0.68);
       --accent:#60a5fa;
-      --good:#22c55e;
       --warn:#f59e0b;
-      --bad:#ef4444;
+      --ok:#22c55e;
     }
+
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: radial-gradient(1200px 600px at 20% 10%, rgba(96,165,250,0.25), transparent),
-                  radial-gradient(900px 500px at 90% 30%, rgba(245,158,11,0.18), transparent),
-                  var(--bg);
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(96,165,250,0.25), transparent),
+        radial-gradient(900px 500px at 90% 30%, rgba(245,158,11,0.18), transparent),
+        var(--bg);
       color: var(--text);
-      min-height: 100vh;
-      padding: 28px;
+      min-height:100vh;
+      padding: 26px;
     }
+
     header{
-      max-width: 1200px;
+      max-width: 1300px;
       margin: 0 auto 18px;
       display:flex;
-      gap: 16px;
-      align-items: flex-end;
-      justify-content: space-between;
-      flex-wrap: wrap;
+      gap: 14px;
+      align-items:flex-end;
+      justify-content:space-between;
+      flex-wrap:wrap;
     }
-    h1{
-      margin:0;
-      font-size: 28px;
-      letter-spacing: 0.2px;
-    }
-    .sub{
-      margin-top:6px;
-      color: var(--muted);
-      font-size: 14px;
-    }
+
+    h1{ margin:0; font-size: 26px; letter-spacing:0.2px; }
+    .sub{ margin-top:6px; color:var(--muted); font-size:14px; }
+
     .pill{
       border:1px solid var(--stroke);
       background: rgba(0,0,0,0.22);
@@ -56,26 +53,26 @@
       align-items:center;
       max-width: 100%;
     }
-    .pill label{ font-size: 12px; color: var(--muted); }
+    .pill label{ font-size:12px; color:var(--muted); }
     .pill input{
-      width: 380px;
-      max-width: 55vw;
+      width: 420px;
+      max-width: 70vw;
+      border:none;
+      outline:none;
       background: transparent;
-      border: none;
-      outline: none;
       color: var(--text);
       font-size: 13px;
     }
 
-    .wrap{
-      max-width: 1200px;
+    .grid{
+      max-width: 1300px;
       margin: 0 auto;
       display:grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 14px;
     }
-    @media (min-width: 1120px){
-      .wrap{ grid-template-columns: 1fr 1fr; }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
     }
 
     .card{
@@ -84,30 +81,33 @@
       border-radius: 18px;
       padding: 16px;
       box-shadow: 0 22px 70px rgba(0,0,0,0.35);
-      overflow: hidden;
+      overflow:hidden;
     }
 
-    .row{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-      align-items:start;
+    .topline{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
     .meta h2{
-      margin: 0 0 6px;
+      margin:0 0 6px;
       font-size: 18px;
     }
     .meta .desc{
-      margin: 0 0 10px;
+      margin:0;
       font-size: 13px;
       color: var(--muted);
-      line-height: 1.35;
+      line-height:1.35;
     }
+
     .tags{
       display:flex;
       gap: 8px;
       flex-wrap: wrap;
+      margin-top: 10px;
     }
     .tag{
       font-size: 12px;
@@ -116,14 +116,45 @@
       border: 1px solid var(--stroke);
       background: rgba(0,0,0,0.18);
       color: var(--muted);
+      user-select:none;
+    }
+
+    .stageWrap{
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.20);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    /* PREVIEW RESPONSIVO: encaixa na largura do card */
+    .iframeStage{
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1920 / 600; /* default; será ajustado via JS */
+      height: auto;
+      border-radius: 14px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.30);
+    }
+    .iframeStage iframe{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display:block;
+      background: transparent;
     }
 
     .form{
+      margin-top: 12px;
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
-    @media (max-width: 860px){
+    @media (max-width: 580px){
       .form{ grid-template-columns: 1fr; }
     }
 
@@ -147,35 +178,19 @@
       color: var(--text);
       font-size: 14px;
     }
-    .field input[type="color"]{
-      width: 100%;
-      height: 38px;
-      padding: 0;
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 10px;
-      background: transparent;
-      cursor: pointer;
-    }
 
     .actions{
+      margin-top: 12px;
       display:flex;
+      align-items:center;
+      justify-content:space-between;
       gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      align-items:center;
-      justify-content: flex-start;
-    }
-    .actions .rightActions{
-      margin-left: auto;
-      display:flex;
-      gap:10px;
-      align-items:center;
       flex-wrap: wrap;
     }
 
-    .btns{
+    .btnRow{
       display:flex;
-      gap: 10px;
+      gap:10px;
       flex-wrap: wrap;
       align-items:center;
     }
@@ -187,28 +202,21 @@
       padding: 10px 12px;
       border-radius: 14px;
       cursor:pointer;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 0.2px;
+      font-size: 12px;
     }
     button.primary{
       border-color: rgba(96,165,250,0.45);
       background: rgba(96,165,250,0.16);
     }
-    button.good{
+    button.ok{
       border-color: rgba(34,197,94,0.45);
       background: rgba(34,197,94,0.14);
     }
     button.warn{
       border-color: rgba(245,158,11,0.55);
       background: rgba(245,158,11,0.14);
-    }
-    button.ghost{
-      background: rgba(0,0,0,0.16);
-    }
-    button.small{
-      padding: 9px 11px;
-      border-radius: 12px;
-      font-size: 12px;
     }
 
     .sizepill{
@@ -231,7 +239,7 @@
     }
 
     .out{
-      margin-top: 10px;
+      margin-top: 12px;
       border: 1px dashed rgba(255,255,255,0.20);
       background: rgba(0,0,0,0.18);
       border-radius: 14px;
@@ -249,9 +257,9 @@
     }
 
     .hint{
+      margin-top: 10px;
       font-size: 12px;
       color: var(--muted);
-      margin-top: 10px;
       line-height: 1.35;
     }
 
@@ -269,93 +277,18 @@
       pointer-events:none;
       transition: opacity 220ms ease;
       font-size: 13px;
-      z-index: 999;
+      z-index: 9999;
     }
     .toast.show{ opacity: 1; }
-
-    .previewWrap{
-      margin-top: 12px;
-      border: 1px solid rgba(255,255,255,0.14);
-      border-radius: 16px;
-      overflow: hidden;
-      background:
-        linear-gradient(0deg, rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
-        repeating-conic-gradient(from 0deg, rgba(255,255,255,0.08) 0 25%, transparent 0 50%)
-        0 0/24px 24px;
-    }
-
-    .previewTop{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content: space-between;
-      padding: 10px 12px;
-      background: rgba(0,0,0,0.28);
-      border-bottom: 1px solid rgba(255,255,255,0.10);
-    }
-
-    .previewTop .left{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .toggle{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,0.18);
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      color: var(--muted);
-      user-select: none;
-    }
-
-    .toggle input{ accent-color: var(--accent); }
-
-    .iframeStage{
-      position: relative;
-      width: 100%;
-      height: 260px;
-      background: transparent;
-    }
-
-    .iframeStage iframe{
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display:block;
-      background: transparent;
-    }
-
-    .note{
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 8px;
-      line-height: 1.35;
-    }
-
-    .colorRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    @media (max-width: 860px){
-      .colorRow{ grid-template-columns: 1fr; }
-    }
   </style>
 </head>
+
 <body>
 
 <header>
   <div>
-    <h1>Página de Edição de Overlays (OBS)</h1>
-    <div class="sub">Escolhe uma animação, preenche os campos e copia o link final já com parâmetros. Tens preview embutido por card.</div>
+    <h1>Página de Testes de Overlays (OBS)</h1>
+    <div class="sub">Escolhe uma animação, ajusta os campos e copia o link final. O preview encaixa sempre no card.</div>
   </div>
 
   <div class="pill">
@@ -364,72 +297,56 @@
   </div>
 </header>
 
-<div class="wrap" id="list"></div>
+<div class="grid" id="grid"></div>
 
 <div class="toast" id="toast">Copiado ✅</div>
 
 <script>
   // =========================
-  // Página de Testes (OBS)
-  // - Gera links com querystring
-  // - Preview embutido + preview OBS (iframe 1920x600/1080)
-  // - Reset da wordcloud via /clear-chat (words opcionais)
+  // Config
   // =========================
 
   const ANIMS = [
     {
-      id: 'votacao_ao_vivo_sim_nao',
+      id: 'votacao_sim_nao',
       name: 'Votação ao Vivo (Sim / Não) — amCharts',
-      desc: 'Gráfico circular (amCharts) para Sim/Não. Lê via wordcloud. Usa parâmetros yes/no e domain.',
+      desc: 'Gráfico circular para Sim/Não. Lê via wordcloud. Parâmetros yes/no e domain.',
       baseUrl: 'https://votacao-ao-vivo.vercel.app/',
-      tags: ['Sim/Não', 'amCharts', 'wordcloud', 'OBS'],
+      tags: ['Sim/Não','amCharts','wordcloud'],
       params: [
-        { key: 'yes', label: 'Texto Sim', type: 'text', def: 'Sim' },
-        { key: 'no', label: 'Texto Não', type: 'text', def: 'Não' },
+        { key:'yes', label:'Texto Sim', type:'text', def:'Sim' },
+        { key:'no',  label:'Texto Não', type:'text', def:'Não' },
       ],
-      colors: [
-        { key: 'yesColor', label: 'Cor Sim', def: '#22c55e' },
-        { key: 'noColor', label: 'Cor Não', def: '#60a5fa' },
-      ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('yes', vals.yes);
-        q.set('no', vals.no);
-        if (vals.yesColor) q.set('yesColor', vals.yesColor);
-        if (vals.noColor) q.set('noColor', vals.noColor);
+        q.set('yes', v.yes);
+        q.set('no', v.no);
         q.set('domain', domain);
         return q;
       },
-      resetWords: (vals) => `${vals.yes},${vals.no}`
+      resetWords: (v) => `${v.yes},${v.no}`
     },
 
     {
-      id: 'votacoes_poll4_abcd',
-      name: 'Votações (A/B/C/D) — contadores + barras',
-      desc: 'Poll 4 opções (A/B/C/D). Pergunta + opções no URL. Lê via wordcloud (A,B,C,D).',
+      id: 'poll4_abcd',
+      name: 'Poll 4 (A/B/C/D) — barras',
+      desc: 'Pergunta + 4 opções. Lê via wordcloud (A,B,C,D).',
       baseUrl: 'https://votacoes.vercel.app/',
-      tags: ['A/B/C/D', 'barras', 'wordcloud', 'OBS'],
+      tags: ['A/B/C/D','barras','wordcloud'],
       params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Qual escolhes?' },
-        { key: 'a', label: 'Opção A', type: 'text', def: 'Opção A' },
-        { key: 'b', label: 'Opção B', type: 'text', def: 'Opção B' },
-        { key: 'c', label: 'Opção C', type: 'text', def: 'Opção C' },
-        { key: 'd', label: 'Opção D', type: 'text', def: 'Opção D' },
+        { key:'title', label:'Título', type:'text', def:'Qual escolhes?' },
+        { key:'a', label:'Opção A', type:'text', def:'Opção A' },
+        { key:'b', label:'Opção B', type:'text', def:'Opção B' },
+        { key:'c', label:'Opção C', type:'text', def:'Opção C' },
+        { key:'d', label:'Opção D', type:'text', def:'Opção D' },
       ],
-      colors: [
-        { key: 'colorA', label: 'Cor A', def: '#60a5fa' },
-        { key: 'colorB', label: 'Cor B', def: '#a78bfa' },
-        { key: 'colorC', label: 'Cor C', def: '#f59e0b' },
-        { key: 'colorD', label: 'Cor D', def: '#22c55e' },
-      ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('a', vals.a);
-        q.set('b', vals.b);
-        q.set('c', vals.c);
-        q.set('d', vals.d);
-        ['colorA','colorB','colorC','colorD'].forEach(k => { if (vals[k]) q.set(k, vals[k]); });
+        q.set('title', v.title);
+        q.set('a', v.a);
+        q.set('b', v.b);
+        q.set('c', v.c);
+        q.set('d', v.d);
         q.set('domain', domain);
         return q;
       },
@@ -437,261 +354,144 @@
     },
 
     {
-      id: 'quizz_relampago_2op',
+      id: 'quizz2',
       name: 'Quizz Relâmpago (2 opções)',
       desc: 'Pergunta + 2 respostas com contagem e barras. Aceita votos A/B. Lê via wordcloud.',
       baseUrl: 'https://quizz-relampago.vercel.app/',
-      tags: ['A/B', 'barras', 'wordcloud', 'OBS'],
+      tags: ['A/B','barras','wordcloud'],
       params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
-        { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
-        { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
-        { key: 'keyA', label: 'Voto A (tecla)', type: 'text', def: 'A' },
-        { key: 'keyB', label: 'Voto B (tecla)', type: 'text', def: 'B' },
+        { key:'question', label:'Pergunta', type:'text', def:'Qual escolhes?' },
+        { key:'a', label:'Resposta A', type:'text', def:'Opção A' },
+        { key:'b', label:'Resposta B', type:'text', def:'Opção B' },
+        { key:'keyA', label:'Voto A (tecla)', type:'text', def:'A' },
+        { key:'keyB', label:'Voto B (tecla)', type:'text', def:'B' },
       ],
-      colors: [
-        { key: 'colorA', label: 'Cor A', def: '#22c55e' },
-        { key: 'colorB', label: 'Cor B', def: '#60a5fa' },
-      ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('question', vals.question);
-        q.set('a', vals.a);
-        q.set('b', vals.b);
-        q.set('keyA', vals.keyA);
-        q.set('keyB', vals.keyB);
-        if (vals.colorA) q.set('colorA', vals.colorA);
-        if (vals.colorB) q.set('colorB', vals.colorB);
+        q.set('question', v.question);
+        q.set('a', v.a);
+        q.set('b', v.b);
+        q.set('keyA', v.keyA);
+        q.set('keyB', v.keyB);
         q.set('domain', domain);
         return q;
       },
-      resetWords: (vals) => `${vals.keyA},${vals.keyB}`
+      resetWords: (v) => `${v.keyA},${v.keyB}`
     },
 
     {
-      id: 'quizz3_3op',
-      name: 'Quizz (3 opções)',
-      desc: 'Pergunta + 3 respostas com contagem e barras. Aceita votos A/B/C. Lê via wordcloud.',
-      baseUrl: 'https://quizz3-sage.vercel.app/',
-      tags: ['A/B/C', 'barras', 'wordcloud', 'OBS'],
-      params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
-        { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
-        { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
-        { key: 'c', label: 'Resposta C', type: 'text', def: 'Opção C' },
-      ],
-      colors: [
-        { key: 'colorA', label: 'Cor A', def: '#60a5fa' },
-        { key: 'colorB', label: 'Cor B', def: '#a78bfa' },
-        { key: 'colorC', label: 'Cor C', def: '#f59e0b' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        q.set('question', vals.question);
-        q.set('a', vals.a);
-        q.set('b', vals.b);
-        q.set('c', vals.c);
-        ['colorA','colorB','colorC'].forEach(k => { if (vals[k]) q.set(k, vals[k]); });
-        q.set('domain', domain);
-        return q;
-      },
-      resetWords: () => `A,B,C`
-    },
-
-    {
-      id: 'quizz2_2op_alt',
-      name: 'Quizz 2 (2 opções) — variante',
-      desc: 'Versão alternativa 2 opções. Aceita votos A/B. Lê via wordcloud.',
-      baseUrl: 'https://quizz2-kappa.vercel.app/',
-      tags: ['A/B', 'variante', 'wordcloud', 'OBS'],
-      params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
-        { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
-        { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
-      ],
-      colors: [
-        { key: 'colorA', label: 'Cor A', def: '#22c55e' },
-        { key: 'colorB', label: 'Cor B', def: '#60a5fa' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        q.set('question', vals.question);
-        q.set('a', vals.a);
-        q.set('b', vals.b);
-        if (vals.colorA) q.set('colorA', vals.colorA);
-        if (vals.colorB) q.set('colorB', vals.colorB);
-        q.set('domain', domain);
-        return q;
-      },
-      resetWords: () => `A,B`
-    },
-
-    {
-      id: 'quizz4_4op',
-      name: 'Quizz (4 opções)',
-      desc: 'Pergunta + 4 respostas com contagem. Aceita votos A/B/C/D. Lê via wordcloud.',
-      baseUrl: 'https://quizz4-beta.vercel.app/',
-      tags: ['A/B/C/D', 'barras', 'wordcloud', 'OBS'],
-      params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
-        { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
-        { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
-        { key: 'c', label: 'Resposta C', type: 'text', def: 'Opção C' },
-        { key: 'd', label: 'Resposta D', type: 'text', def: 'Opção D' },
-      ],
-      colors: [
-        { key: 'colorA', label: 'Cor A', def: '#60a5fa' },
-        { key: 'colorB', label: 'Cor B', def: '#a78bfa' },
-        { key: 'colorC', label: 'Cor C', def: '#f59e0b' },
-        { key: 'colorD', label: 'Cor D', def: '#22c55e' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        q.set('question', vals.question);
-        q.set('a', vals.a);
-        q.set('b', vals.b);
-        q.set('c', vals.c);
-        q.set('d', vals.d);
-        ['colorA','colorB','colorC','colorD'].forEach(k => { if (vals[k]) q.set(k, vals[k]); });
-        q.set('domain', domain);
-        return q;
-      },
-      resetWords: () => `A,B,C,D`
-    },
-
-    {
-      id: 'question_and_comments',
-      name: 'Pergunta + Comentários (mural vertical)',
-      desc: 'Mostra pergunta e comentários em tempo real (efeito mural). Lê via wordcloud.',
+      id: 'wordcloud_q',
+      name: 'Pergunta + Comentários (mural)',
+      desc: 'Mostra pergunta e comentários em tempo real (mural vertical).',
       baseUrl: 'https://questionandcomments.vercel.app/',
-      tags: ['chat', 'mural', 'wordcloud', 'OBS'],
+      tags: ['chat','mural','wordcloud'],
       params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Escreve no chat…' },
+        { key:'question', label:'Pergunta', type:'text', def:'Escreve no chat…' },
       ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('question', vals.question);
+        q.set('question', v.question);
         q.set('domain', domain);
         return q;
       }
     },
 
     {
-      id: 'palavra_secreta',
-      name: 'Palavra Secreta (forca leve)',
-      desc: 'Mostra só traços e revela letras quando aparecem nos comentários. Lê via wordcloud.',
+      id: 'palavra',
+      name: 'Palavra Secreta (traços + letras)',
+      desc: 'Mostra só traços e revela letras quando aparecem nos comentários.',
       baseUrl: 'https://palavra-secreta-sage.vercel.app/',
-      tags: ['puzzle', 'forca', 'wordcloud', 'OBS'],
+      tags: ['puzzle','forca','wordcloud'],
       params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Palavra Secreta' },
-        { key: 'word', label: 'Palavra', type: 'text', def: 'LIDERANCA' },
-        { key: 'tries', label: 'Tentativas', type: 'number', def: '8' },
+        { key:'title', label:'Título', type:'text', def:'Palavra Secreta' },
+        { key:'word', label:'Palavra', type:'text', def:'LIDERANCA' },
+        { key:'tries', label:'Tentativas', type:'number', def:'8' },
       ],
-      colors: [
-        { key: 'accent', label: 'Cor destaque', def: '#60a5fa' },
-      ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('word', vals.word);
-        q.set('tries', vals.tries);
-        if (vals.accent) q.set('accent', vals.accent);
+        q.set('title', v.title);
+        q.set('word', v.word);
+        q.set('tries', v.tries);
         q.set('domain', domain);
         return q;
       }
     },
 
     {
-      id: 'delay_game',
+      id: 'delay',
       name: 'Delay vs Orador (jogo do delay)',
-      desc: 'Frases divertidas enquanto o chat chega (delay). Lê via wordcloud.',
+      desc: 'Frases divertidas enquanto o chat chega.',
       baseUrl: 'https://delay-omega.vercel.app/',
-      tags: ['humor', 'delay', 'wordcloud', 'OBS'],
+      tags: ['humor','delay','wordcloud'],
       params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Delay vs Orador' },
-        { key: 'seconds', label: 'Segundos de delay', type: 'number', def: '30' },
+        { key:'title', label:'Título', type:'text', def:'Delay vs Orador' },
+        { key:'seconds', label:'Segundos de delay', type:'number', def:'30' },
       ],
-      colors: [
-        { key: 'accent', label: 'Cor destaque', def: '#f59e0b' },
-      ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('seconds', vals.seconds);
-        if (vals.accent) q.set('accent', vals.accent);
+        q.set('title', v.title);
+        q.set('seconds', v.seconds);
         q.set('domain', domain);
         return q;
       }
     },
 
     {
-      id: 'url_six',
+      id: 'url',
       name: 'Website / URL (cartão animado)',
-      desc: 'Overlay para divulgar um link (callout).',
+      desc: 'Overlay para divulgar um link.',
       baseUrl: 'https://url-six-ruddy.vercel.app/',
-      tags: ['URL', 'callout', 'OBS'],
+      tags: ['URL','callout'],
       params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Vai ao site' },
-        { key: 'url', label: 'URL', type: 'text', def: 'https://teusite.com' },
+        { key:'title', label:'Título', type:'text', def:'Vai ao site' },
+        { key:'url', label:'URL', type:'text', def:'https://teusite.com' },
       ],
-      colors: [
-        { key: 'accent', label: 'Cor destaque', def: '#60a5fa' },
-      ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('url', vals.url);
-        if (vals.accent) q.set('accent', vals.accent);
+        q.set('title', v.title);
+        q.set('url', v.url);
         q.set('domain', domain);
         return q;
       }
     },
 
     {
-      id: 'medidor_energia',
+      id: 'energia',
       name: 'Medidor de Energia da Live',
-      desc: 'Barra de energia que cresce com comentários. Lê via wordcloud.',
+      desc: 'Barra de energia que cresce com comentários.',
       baseUrl: 'https://medidor-energia.vercel.app/',
-      tags: ['energia', 'barra', 'wordcloud', 'OBS'],
+      tags: ['energia','barra','wordcloud'],
       params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Energia da Live' },
-        { key: 'max', label: 'Comentários para encher', type: 'number', def: '120' },
+        { key:'title', label:'Título', type:'text', def:'Energia da Live' },
+        { key:'max', label:'Comentários para encher', type:'number', def:'120' },
       ],
-      colors: [
-        { key: 'accent', label: 'Cor barra', def: '#f59e0b' },
-      ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('max', vals.max);
-        if (vals.accent) q.set('accent', vals.accent);
+        q.set('title', v.title);
+        q.set('max', v.max);
         q.set('domain', domain);
         return q;
       }
     },
 
     {
-      id: 'balanca_wheat',
-      name: 'Balança (A vs B) — versão final',
-      desc: 'A tua balança final (laranja neutro, emojis crescem).',
+      id: 'balanca',
+      name: 'Balança (A vs B)',
+      desc: 'Balança de decisão com emojis a crescer.',
       baseUrl: 'https://balanca-wheat.vercel.app/',
-      tags: ['A/B', 'balança', 'wordcloud', 'OBS'],
+      tags: ['A/B','balança','wordcloud'],
       params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Balança de Decisão' },
-        { key: 'optionA', label: 'Opção A', type: 'text', def: 'Opção A' },
-        { key: 'optionB', label: 'Opção B', type: 'text', def: 'Opção B' },
-        { key: 'align', label: 'Alinhamento', type: 'text', def: 'bottom' },
+        { key:'question', label:'Pergunta', type:'text', def:'Balança de Decisão' },
+        { key:'optionA', label:'Opção A', type:'text', def:'Opção A' },
+        { key:'optionB', label:'Opção B', type:'text', def:'Opção B' },
+        { key:'align', label:'Alinhamento', type:'text', def:'bottom' },
       ],
-      colors: [
-        { key: 'accent', label: 'Cor destaque', def: '#f59e0b' },
-      ],
-      build: (vals, domain) => {
+      build: (v, domain) => {
         const q = new URLSearchParams();
-        q.set('question', vals.question);
-        q.set('optionA', vals.optionA);
-        q.set('optionB', vals.optionB);
-        q.set('align', vals.align);
-        if (vals.accent) q.set('accent', vals.accent);
+        q.set('question', v.question);
+        q.set('optionA', v.optionA);
+        q.set('optionB', v.optionB);
+        q.set('align', v.align);
         q.set('domain', domain);
         return q;
       },
@@ -699,26 +499,17 @@
     }
   ];
 
-  const $list = document.getElementById('list');
+  // =========================
+  // Helpers
+  // =========================
+  const $grid = document.getElementById('grid');
   const $domain = document.getElementById('domain');
   const $toast = document.getElementById('toast');
-
-  function el(tag, attrs = {}, children = []){
-    const node = document.createElement(tag);
-    for (const [k, v] of Object.entries(attrs)){
-      if (k === 'class') node.className = v;
-      else if (k === 'html') node.innerHTML = v;
-      else if (k === 'text') node.textContent = v;
-      else node.setAttribute(k, v);
-    }
-    for (const c of children) node.appendChild(c);
-    return node;
-  }
 
   function toast(msg){
     $toast.textContent = msg;
     $toast.classList.add('show');
-    setTimeout(()=> $toast.classList.remove('show'), 900);
+    setTimeout(()=> $toast.classList.remove('show'), 850);
   }
 
   function normalizeBaseUrl(u){
@@ -727,295 +518,199 @@
 
   function buildUrl(baseUrl, query){
     const base = normalizeBaseUrl(baseUrl);
-    const cleaned = new URLSearchParams(query);
-
-    for (const [k,v] of cleaned.entries()) {
-      if (v === '' || v == null) cleaned.delete(k);
-    }
-    if (cleaned.has('domain') && !String(cleaned.get('domain') || '').trim()) cleaned.delete('domain');
-
-    const qs = cleaned.toString();
+    const qs = query.toString();
     return qs ? `${base}/?${qs}` : `${base}/`;
   }
 
-  function openObsPreview(url, w, h){
-    const win = window.open('', '_blank');
-    if (!win) return;
-    const safeUrl = String(url).replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    win.document.open();
-    win.document.write(`<!doctype html>
-<html lang="pt">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Preview OBS ${w}x${h}</title>
-<style>
-  html,body{height:100%;margin:0;background:#05070e;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
-  .top{position:fixed;left:12px;right:12px;top:12px;display:flex;gap:10px;align-items:center;justify-content:space-between;z-index:5}
-  .chip{border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);padding:8px 10px;border-radius:999px;font-size:12px;color:rgba(255,255,255,.75);backdrop-filter: blur(8px);}
-  .chip strong{color:#fff}
-  .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:60px 18px 18px;}
-  .stage{width:${w}px;height:${h}px;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.14);box-shadow:0 40px 120px rgba(0,0,0,.55);background:#000;}
-  .stage iframe{width:100%;height:100%;border:0;display:block;background:transparent;}
-  @media (max-width:${w+80}px){
-    .stage{transform: scale(calc((100vw - 36px)/${w})); transform-origin: top center;}
-    .wrap{align-items:flex-start;}
+  function el(tag, attrs = {}, children = []){
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)){
+      if (k === 'class') n.className = v;
+      else if (k === 'text') n.textContent = v;
+      else if (k === 'html') n.innerHTML = v;
+      else n.setAttribute(k, v);
+    }
+    children.forEach(c => n.appendChild(c));
+    return n;
   }
-  @media (max-height:${h+140}px){
-    .stage{transform: scale(calc((100vh - 120px)/${h})); transform-origin: top center;}
-    .wrap{align-items:flex-start;}
-  }
-</style>
-</head>
-<body>
-  <div class="top">
-    <div class="chip"><strong>Preview OBS</strong> ${w}×${h}</div>
-    <div class="chip">URL: ${safeUrl}</div>
-  </div>
-  <div class="wrap">
-    <div class="stage"><iframe allow="autoplay" src="${safeUrl}"></iframe></div>
-  </div>
-</body>
-</html>`);
-    win.document.close();
+
+  async function copyText(text){
+    try{
+      await navigator.clipboard.writeText(text);
+      return true;
+    }catch{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+      return true;
+    }
   }
 
   async function clearChat(domain, words){
     const base = String(domain || '').trim().replace(/\/$/, '');
-    if (!base) return { ok: false, via: 'none', url: '' };
-
     const url = (words && String(words).trim())
       ? `${base}/clear-chat?words=${encodeURIComponent(words)}`
       : `${base}/clear-chat`;
 
-    try {
-      await fetch(url, { mode: 'no-cors' });
-      return { ok: true, via: 'fetch', url };
-    } catch {
+    // Nota: se estiveres em https e o domain for http, o browser pode bloquear.
+    // Ainda assim, em no-cors costuma “passar”, mas sem feedback real.
+    try{
+      await fetch(url, { mode:'no-cors' });
+      return true;
+    }catch{
       window.open(url, '_blank', 'noopener,noreferrer');
-      return { ok: true, via: 'open', url };
+      return true;
     }
   }
 
+  // =========================
+  // Card builder
+  // =========================
   function buildCard(anim){
-    const meta = el('div', { class: 'meta' }, [
+    const meta = el('div', { class:'meta' }, [
       el('h2', { text: anim.name }),
-      el('div', { class: 'desc', text: anim.desc }),
-      el('div', { class: 'tags' }, (anim.tags || []).map(t => el('span', { class: 'tag', text: t })))
+      el('p', { class:'desc', text: anim.desc }),
+      el('div', { class:'tags' }, (anim.tags||[]).map(t => el('span', { class:'tag', text:t })))
     ]);
 
-    const form = el('div', { class: 'form' });
+    const baseField = el('div', { class:'field' }, [
+      el('label', { text:'Base URL (podes trocar para o teu Vercel)' }),
+    ]);
+    const baseInput = el('input', { type:'text', value: anim.baseUrl });
+    baseField.appendChild(baseInput);
+
+    const form = el('div', { class:'form' }, [baseField]);
     const inputs = {};
 
-    const baseField = el('div', { class: 'field' }, [
-      el('label', { text: 'Base URL (pode ser o teu Vercel)' }),
-      (() => {
-        const i = el('input', { type: 'text', value: anim.baseUrl });
-        inputs.__baseUrl = i;
-        return i;
-      })()
-    ]);
-    form.appendChild(baseField);
-
     (anim.params || []).forEach(p => {
-      const field = el('div', { class: 'field' }, [ el('label', { text: p.label }) ]);
-      const i = el('input', {
-        type: p.type || 'text',
-        value: (p.def ?? '')
-      });
+      const f = el('div', { class:'field' }, [
+        el('label', { text: p.label }),
+      ]);
+      const i = el('input', { type: p.type || 'text', value: (p.def ?? '') });
       inputs[p.key] = i;
-      field.appendChild(i);
-      form.appendChild(field);
+      f.appendChild(i);
+      form.appendChild(f);
     });
 
-    if (Array.isArray(anim.colors) && anim.colors.length){
-      const holder = el('div', { class: 'field', style: 'grid-column: 1 / -1;' }, [
-        el('label', { text: 'Cores (opcional)' })
-      ]);
-      const colorWrap = el('div', { class: 'colorRow' });
-      anim.colors.forEach(c => {
-        const field = el('div', { class: 'field' }, [
-          el('label', { text: c.label }),
-        ]);
-        const i = el('input', { type: 'color', value: (c.def ?? '#ffffff') });
-        inputs[c.key] = i;
-        field.appendChild(i);
-        colorWrap.appendChild(field);
-      });
-      holder.appendChild(colorWrap);
-      form.appendChild(holder);
-      form.appendChild(el('div', { style: 'grid-column: 1 / -1;' }, [
-        el('div', { class: 'note', html: '<b>Nota:</b> só terá efeito se a overlay ler estes parâmetros de cor.' })
-      ]));
+    // Preview
+    const iframeStage = el('div', { class:'iframeStage' }, []);
+    const iframe = el('iframe', { allow:'autoplay' });
+    iframeStage.appendChild(iframe);
+
+    const sizeSel = el('select', {}, [
+      el('option', { value:'1920x600', text:'1920×600' }),
+      el('option', { value:'1920x1080', text:'1920×1080' }),
+    ]);
+
+    function applyStageSize(){
+      const [w, h] = String(sizeSel.value || '1920x600').split('x').map(n => parseInt(n, 10));
+      iframeStage.style.aspectRatio = `${w} / ${h}`;
     }
 
-    const out = el('div', { class: 'out' }, [
-      el('div', { class: 'label', text: 'Link final (OBS Browser Source)' }),
-      el('div', { class: 'url', text: '' })
+    // Output URL (para copiar)
+    const out = el('div', { class:'out' }, [
+      el('div', { class:'label', text:'Link final (OBS Browser Source)' }),
+      el('div', { class:'url', text:'' }),
     ]);
     const outUrl = out.querySelector('.url');
 
     function getVals(){
-      const vals = {};
-      (anim.params || []).forEach(p => vals[p.key] = (inputs[p.key]?.value ?? ''));
-      (anim.colors || []).forEach(c => vals[c.key] = (inputs[c.key]?.value ?? ''));
-      return vals;
+      const v = {};
+      (anim.params || []).forEach(p => v[p.key] = (inputs[p.key]?.value ?? ''));
+      return v;
     }
 
     function compute(){
-      const domain = ($domain.value || '').trim();
-      const base = (inputs.__baseUrl.value || anim.baseUrl).trim();
+      const domain = ($domain.value || '').trim() || 'http://localhost:3900';
+      const base = (baseInput.value || anim.baseUrl).trim();
       const vals = getVals();
       const query = anim.build(vals, domain);
       const url = buildUrl(base, query);
       outUrl.textContent = url;
+      iframe.src = url;
       return { url, domain, vals };
     }
 
-    const previewToggle = el('label', { class: 'toggle' }, [
-      (() => {
-        const cb = el('input', { type: 'checkbox' });
-        cb.checked = true;
-        return cb;
-      })(),
-      el('span', { text: 'Preview' })
-    ]);
-
-    const sizeSel = el('select', {}, [
-      el('option', { value: '1920x600', text: '1920×600' }),
-      el('option', { value: '1920x1080', text: '1920×1080' }),
-    ]);
-
-    const sizeChip = el('span', { class: 'sizepill' }, [
-      el('span', { text: 'Tamanho' }),
-      sizeSel
-    ]);
-
-    const iframe = el('iframe', { allow: 'autoplay' });
-    const iframeStage = el('div', { class: 'iframeStage' }, [iframe]);
-
-    function applyStageSize(){
-      const [w, h] = String(sizeSel.value || '1920x600').split('x').map(n => parseInt(n, 10));
-      const ratio = h / w;
-      const base = (window.innerWidth > 900 ? 320 : 260);
-      const desired = Math.round(Math.max(220, Math.min(340, base * ratio * 2)));
-      iframeStage.style.height = `${desired}px`;
-    }
-
-    const btnReloadPreview = el('button', { class: 'ghost small', text: 'Recarregar preview' });
-    btnReloadPreview.addEventListener('click', () => {
-      const { url } = compute();
-      iframe.src = url;
-      toast('Preview recarregado');
-    });
-
-    const previewWrap = el('div', { class: 'previewWrap' }, [
-      el('div', { class: 'previewTop' }, [
-        el('div', { class: 'left' }, [
-          el('span', { text: 'Preview (xadrez = transparência)' }),
-        ]),
-        el('div', { class: 'rightActions' }, [previewToggle, sizeChip, btnReloadPreview])
-      ]),
-      iframeStage
-    ]);
-
-    // Botões principais
-    const btnCopy = el('button', { class: 'good', text: 'Copiar link' });
+    // Actions
+    const btnCopy = el('button', { class:'ok', text:'Copiar link' });
     btnCopy.addEventListener('click', async () => {
       const { url } = compute();
-      try {
-        await navigator.clipboard.writeText(url);
-        toast('Copiado ✅');
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = url;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        ta.remove();
-        toast('Copiado ✅');
-      }
+      await copyText(url);
+      toast('Copiado ✅');
     });
 
-    const btnOpen = el('button', { class: 'primary', text: 'Abrir (tab)' });
+    const btnOpen = el('button', { class:'primary', text:'Abrir num separador' });
     btnOpen.addEventListener('click', () => {
       const { url } = compute();
       window.open(url, '_blank', 'noopener');
     });
 
-    const btnObs = el('button', { class: 'primary small', text: 'Abrir OBS' });
-    btnObs.addEventListener('click', () => {
-      const { url } = compute();
-      const [w, h] = String(sizeSel.value || '1920x600').split('x').map(n => parseInt(n, 10));
-      openObsPreview(url, w, h);
-    });
-
-    const btnReset = el('button', { class: 'ghost', text: 'Reset campos' });
-    btnReset.addEventListener('click', () => {
-      inputs.__baseUrl.value = anim.baseUrl;
-      (anim.params || []).forEach(p => { if (inputs[p.key]) inputs[p.key].value = (p.def ?? ''); });
-      (anim.colors || []).forEach(c => { if (inputs[c.key]) inputs[c.key].value = (c.def ?? '#ffffff'); });
-      scheduleUpdate(true);
+    const btnResetFields = el('button', { text:'Reset campos' });
+    btnResetFields.addEventListener('click', () => {
+      baseInput.value = anim.baseUrl;
+      (anim.params || []).forEach(p => { inputs[p.key].value = (p.def ?? ''); });
+      sizeSel.value = '1920x600';
+      applyStageSize();
+      compute();
       toast('Reset feito');
     });
 
-    const btnResetWordcloud = el('button', { class: 'warn small', text: 'Reset wordcloud' });
+    const btnResetWordcloud = el('button', { class:'warn', text:'Reset wordcloud' });
     btnResetWordcloud.addEventListener('click', async () => {
       const { domain, vals } = compute();
       const words = (typeof anim.resetWords === 'function') ? (anim.resetWords(vals) || '') : '';
-      const res = await clearChat(domain, words);
-      if (res.via === 'none') toast('Sem domain: sem reset ✅');
-      else toast(res.via === 'fetch' ? 'Reset feito ✅' : 'Reset aberto (tab) ✅');
+      await clearChat(domain, words);
+      toast('Reset feito ✅');
     });
 
-    const actions = el('div', { class: 'actions' }, [
-      el('div', { class: 'btns' }, [btnCopy, btnOpen, btnReset]),
-      el('div', { class: 'rightActions' }, [btnObs, btnResetWordcloud])
+    const sizepill = el('span', { class:'sizepill' }, [
+      el('span', { text:'Preview' }),
+      sizeSel
     ]);
 
-    const hint = el('div', { class: 'hint', html: 'Dica: no OBS ativa “Refresh cache of current page”. Se esta página estiver em <b>https</b> e o domain for <b>http</b>, alguns browsers podem bloquear pedidos (mixed content).' });
+    const actions = el('div', { class:'actions' }, [
+      el('div', { class:'btnRow' }, [btnCopy, btnOpen, btnResetFields, sizepill, btnResetWordcloud]),
+    ]);
 
-    let t;
-    function scheduleUpdate(forceNow=false){
-      clearTimeout(t);
-      t = setTimeout(() => {
-        const { url } = compute();
-        applyStageSize();
-        const cb = previewToggle.querySelector('input');
-        if (cb && cb.checked){
-          iframe.src = url;
-        }
-      }, forceNow ? 0 : 220);
-    }
-
-    // listeners
-    Object.values(inputs).forEach(i => i.addEventListener('input', () => scheduleUpdate(false)));
-    $domain.addEventListener('input', () => scheduleUpdate(false));
-    sizeSel.addEventListener('change', () => scheduleUpdate(true));
-
-    previewToggle.querySelector('input').addEventListener('change', (e) => {
-      if (e.target.checked){
-        scheduleUpdate(true);
-      } else {
-        iframe.removeAttribute('src');
-      }
+    const hint = el('div', { class:'hint', html:
+      'Dica: no OBS, ativa “Refresh cache of current page” quando estiveres a testar. Se esta página estiver em <b>https</b> e o domain for <b>http</b>, alguns browsers podem bloquear pedidos (mixed content).'
     });
 
-    const right = el('div', {}, [form, actions, out, previewWrap, hint]);
-    const row = el('div', { class: 'row' }, [meta, right]);
-    const card = el('div', { class: 'card' }, [row]);
+    const stageWrap = el('div', { class:'stageWrap' }, [
+      iframeStage,
+      hint
+    ]);
 
-    setTimeout(() => scheduleUpdate(true), 0);
+    // Wire events
+    baseInput.addEventListener('input', compute);
+    Object.values(inputs).forEach(i => i.addEventListener('input', compute));
+    $domain.addEventListener('input', compute);
+
+    sizeSel.addEventListener('change', () => {
+      applyStageSize();
+    });
+
+    // Build card
+    const card = el('div', { class:'card' }, [
+      el('div', { class:'topline' }, [meta]),
+      form,
+      actions,
+      out,
+      stageWrap
+    ]);
+
+    // init
+    applyStageSize();
+    setTimeout(compute, 0);
+
     return card;
   }
 
-  // render
-  ANIMS.forEach(a => $list.appendChild(buildCard(a)));
-
-  // resize recalcs (preview)
-  window.addEventListener('resize', () => {
-    document.querySelectorAll('.iframeStage').forEach(() => {});
-  });
+  // Render
+  ANIMS.forEach(a => $grid.appendChild(buildCard(a)));
 </script>
 
 </body>
