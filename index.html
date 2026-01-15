@@ -3,27 +3,93 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Página de edição de Overlays (OBS)</title>
-
+  <title>Testes de Overlays (OBS)</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
 
-<header>
-  <div>
+<header class="header">
+  <div class="header-left">
     <h1>Página de Testes de Overlays (OBS)</h1>
-    <div class="sub">
-      Escolhe uma animação, preenche os campos e copia o link final já com parâmetros.
+    <div class="sub">Gera links com parâmetros, guarda presets, e agora tens modo grid com editor inline.</div>
+
+    <div class="toolbar">
+      <div class="pill">
+        <label for="domain">Domain</label>
+        <input id="domain" type="text" value="http://localhost:3900" />
+      </div>
+
+      <div class="pill">
+        <label for="search">Pesquisar</label>
+        <input id="search" type="text" placeholder="Ex: quizz, energia, palavra…" />
+      </div>
+
+      <div class="pill">
+        <label for="category">Categoria</label>
+        <select id="category">
+          <option value="all">Todas</option>
+        </select>
+      </div>
+
+      <div class="pill">
+        <label for="mode">Modo</label>
+        <select id="mode">
+          <option value="cards">Cards</option>
+          <option value="grid" selected>Grid (previews)</option>
+        </select>
+      </div>
+
+      <div class="pill">
+        <label for="gridCols">Colunas</label>
+        <select id="gridCols">
+          <option value="2">2</option>
+          <option value="3" selected>3</option>
+          <option value="4">4</option>
+        </select>
+      </div>
+
+      <div class="pill">
+        <label for="stageSize">Palco</label>
+        <select id="stageSize">
+          <option value="1920x600" selected>1920×600</option>
+          <option value="1920x1080">1920×1080</option>
+        </select>
+      </div>
+
+      <button id="onlyFavs" class="ghost small">⭐ Só favoritos</button>
+
+      <div class="pill">
+        <label for="autoRefresh">Auto-refresh</label>
+        <select id="autoRefresh">
+          <option value="off" selected>Off</option>
+          <option value="on">On</option>
+        </select>
+      </div>
+
+      <div class="pill">
+        <label for="refreshSec">Cada (s)</label>
+        <input id="refreshSec" type="number" min="3" step="1" value="15" />
+      </div>
     </div>
   </div>
 
-  <div class="pill">
-    <label for="domain">Domain</label>
-    <input id="domain" type="text" value="http://localhost:3900" />
+  <div class="header-right">
+    <div class="btn-row">
+      <button id="exportPresets" class="ghost small">Exportar presets</button>
+      <label class="filebtn small">
+        Importar presets
+        <input id="importPresets" type="file" accept="application/json" />
+      </label>
+      <button id="wipePresets" class="warn small">Apagar presets</button>
+    </div>
+
+    <div class="hint">
+      Dica: “Copiar (OBS)” adiciona um parâmetro <b>t=timestamp</b> para forçar refresh.
+    </div>
   </div>
 </header>
 
-<div class="wrap" id="list"></div>
+<main class="wrap" id="list"></main>
 
 <div class="toast" id="toast">Copiado ✅</div>
 
