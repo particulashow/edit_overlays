@@ -7,11 +7,9 @@
   <style>
     :root{
       --bg:#0b0f1a;
-      --card: rgba(255,255,255,0.06);
       --stroke: rgba(255,255,255,0.12);
       --text: rgba(255,255,255,0.92);
       --muted: rgba(255,255,255,0.68);
-      --accent:#60a5fa;
       --good:#22c55e;
       --warn:#f59e0b;
     }
@@ -37,7 +35,7 @@
       flex-wrap: wrap;
     }
     h1{ margin:0; font-size: 28px; letter-spacing: 0.2px; }
-    .sub{ margin-top:6px; color: var(--muted); font-size: 14px; max-width: 880px; line-height:1.35; }
+    .sub{ margin-top:6px; color: var(--muted); font-size: 14px; max-width: 920px; line-height:1.35; }
 
     .pill{
       border:1px solid var(--stroke);
@@ -173,6 +171,49 @@
       font-size: 14px;
     }
 
+    .sectionTitle{
+      margin: 2px 0 -2px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.78);
+      letter-spacing: .22px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .colorGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 2px;
+    }
+    @media (max-width: 560px){
+      .colorGrid{ grid-template-columns: 1fr; }
+    }
+
+    .colorRow{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .swatch{
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.2);
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+    input[type="color"]{
+      width: 44px;
+      height: 34px;
+      padding:0;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      background: transparent;
+    }
+
     .out{
       border: 1px dashed rgba(255,255,255,0.20);
       background: rgba(0,0,0,0.18);
@@ -205,7 +246,7 @@
 
     .stageWrap{
       width: 100%;
-      aspect-ratio: 16/6; /* 1920x720-ish (bom para overlays) */
+      aspect-ratio: 16/6;
       background: #000;
       position: relative;
     }
@@ -246,7 +287,7 @@
 <header>
   <div>
     <h1>Página de Testes de Overlays (OBS)</h1>
-    <div class="sub">Escolhe uma animação, preenche os campos e copia o link final. Podes ver o preview dentro do card ou abrir em separador.</div>
+    <div class="sub">Escolhe uma animação, preenche os campos e copia o link final. Agora também podes injectar parâmetros de cor (quando fizer sentido) sem mexer no código da overlay.</div>
   </div>
 
   <div class="pill">
@@ -264,19 +305,28 @@
   // Página de Testes (OBS)
   // - Gera links com querystring
   // - Preview responsivo dentro do card
-  // - Botão reset wordcloud via /clear-chat
+  // - Reset wordcloud via /clear-chat
+  // - Controlo de CORES: injeta parâmetros no URL (accent/bg/text etc.)
   // =========================
+
+  // Ajusta estes nomes de parâmetros para baterem certo com cada overlay.
+  // Se uma overlay não usar, ignora e não parte nada.
 
   const ANIMS = [
     {
       id: 'votacao_ao_vivo_sim_nao',
       name: 'Votação ao Vivo (Sim / Não) — amCharts',
-      desc: 'Gráfico circular (amCharts) para Sim/Não. Lê via wordcloud. Usa parâmetros yes/no e domain.',
+      desc: 'Gráfico circular (amCharts) para Sim/Não. Lê via wordcloud.',
       baseUrl: 'https://votacao-ao-vivo.vercel.app/',
       tags: ['Sim/Não', 'amCharts', 'wordcloud'],
       params: [
         { key: 'yes', label: 'Texto Sim', type: 'text', def: 'Sim' },
         { key: 'no', label: 'Texto Não', type: 'text', def: 'Não' },
+      ],
+      // Cores genéricas (se a overlay suportar)
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#60a5fa' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
@@ -300,6 +350,11 @@
         { key: 'b', label: 'Opção B', type: 'text', def: 'Opção B' },
         { key: 'c', label: 'Opção C', type: 'text', def: 'Opção C' },
         { key: 'd', label: 'Opção D', type: 'text', def: 'Opção D' },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#60a5fa' },
+        { key: 'track', label: 'Track', def: '#1b2335' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
@@ -327,6 +382,11 @@
         { key: 'keyA', label: 'Voto A (tecla)', type: 'text', def: 'A' },
         { key: 'keyB', label: 'Voto B (tecla)', type: 'text', def: 'B' },
       ],
+      colorParams: [
+        { key: 'aColor', label: 'Cor A', def: '#22c55e' },
+        { key: 'bColor', label: 'Cor B', def: '#3b82f6' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+      ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
         q.set('question', vals.question);
@@ -353,6 +413,10 @@
         { key: 'c', label: 'Resposta C', type: 'text', def: 'Opção C' },
         { key: 'd', label: 'Resposta D', type: 'text', def: 'Opção D' },
       ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#f59e0b' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+      ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
         q.set('question', vals.question);
@@ -375,6 +439,10 @@
       params: [
         { key: 'question', label: 'Pergunta', type: 'text', def: 'Escreve no chat…' },
       ],
+      colorParams: [
+        { key: 'gradient', label: 'Gradiente', def: '#0b0f1a' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+      ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
         q.set('question', vals.question);
@@ -393,6 +461,10 @@
         { key: 'title', label: 'Título', type: 'text', def: 'Palavra Secreta' },
         { key: 'word', label: 'Palavra', type: 'text', def: 'LIDERANCA' },
         { key: 'tries', label: 'Tentativas', type: 'number', def: '8' },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#60a5fa' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
@@ -414,6 +486,10 @@
         { key: 'title', label: 'Título', type: 'text', def: 'Delay vs Orador' },
         { key: 'seconds', label: 'Segundos de delay', type: 'number', def: '30' },
       ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#f59e0b' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+      ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
         q.set('title', vals.title);
@@ -433,6 +509,10 @@
         { key: 'title', label: 'Título', type: 'text', def: 'Vai ao site' },
         { key: 'url', label: 'URL', type: 'text', def: 'https://teusite.com' },
       ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#60a5fa' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+      ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
         q.set('title', vals.title);
@@ -451,6 +531,11 @@
       params: [
         { key: 'title', label: 'Título', type: 'text', def: 'Energia da Live' },
         { key: 'max', label: 'Comentários para encher', type: 'number', def: '120' },
+      ],
+      colorParams: [
+        { key: 'fill', label: 'Barra (fill)', def: '#f59e0b' },
+        { key: 'track', label: 'Track', def: '#1b2335' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
@@ -473,6 +558,11 @@
         { key: 'optionB', label: 'Opção B', type: 'text', def: 'Opção B' },
         { key: 'align', label: 'Alinhamento', type: 'text', def: 'bottom' },
       ],
+      colorParams: [
+        { key: 'aColor', label: 'Cor A', def: '#f59e0b' },
+        { key: 'bColor', label: 'Cor B', def: '#60a5fa' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+      ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
         q.set('question', vals.question);
@@ -485,23 +575,26 @@
       resetWords: () => `A,B`
     },
 
-    // ====== NOVAS (NOME / AVATAR) ======
+    // ===== NOVAS (NOME / AVATAR) =====
     {
       id: 'nome_e_avatar',
       name: 'Lower Third (Nome + Avatar)',
-      desc: 'Lower third com avatar via URL (link direto) e tema (blue/orange/purple/mint). Fundo transparente.',
-      // Nota: o link do Vercel que enviaste é do dashboard. Aqui fica o domínio provável.
-      // Se não bater certo, troca no campo “Base URL” para o teu domínio real.
+      desc: 'Lower third com avatar via URL. Tema e cores (accent/text/bg) por querystring.',
       baseUrl: 'https://nomeeavatar.vercel.app/',
-      tags: ['lower third', 'nome', 'avatar', 'OBS'],
+      tags: ['lower third', 'nome', 'avatar'],
       params: [
         { key: 'name', label: 'Nome', type: 'text', def: 'Tiago Gonçalves' },
         { key: 'role', label: 'Cargo (opcional)', type: 'text', def: 'Host | Partícula Influente' },
         { key: 'avatar', label: 'Avatar (URL direta)', type: 'text', def: '' },
         { key: 'align', label: 'Alinhamento', type: 'select', def: 'left', options: ['left','center','right'] },
-        { key: 'theme', label: 'Tema/Cor', type: 'select', def: 'blue', options: ['blue','orange','purple','mint'] },
+        { key: 'theme', label: 'Tema', type: 'select', def: 'blue', options: ['blue','orange','purple','mint'] },
         { key: 'duration', label: 'Auto-hide (segundos, 0=fixo)', type: 'number', def: '0' },
         { key: 'show', label: 'Mostrar (1/0)', type: 'select', def: '1', options: ['1','0'] },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#60a5fa' },
+        { key: 'bg', label: 'Fundo', def: '#0b0f1a' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
@@ -512,7 +605,6 @@
         q.set('theme', vals.theme);
         q.set('duration', vals.duration);
         q.set('show', vals.show);
-        // domain por consistência (mesmo que a overlay não use)
         q.set('domain', domain);
         return q;
       }
@@ -521,15 +613,20 @@
     {
       id: 'nome_red',
       name: 'Lower Third (Nome) — versão Red',
-      desc: 'Versão simples focada no nome (estilo callout). Fundo transparente.',
+      desc: 'Versão simples focada no nome. Cores por querystring (accent/text/bg).',
       baseUrl: 'https://nome-red.vercel.app/',
-      tags: ['lower third', 'nome', 'OBS'],
+      tags: ['lower third', 'nome'],
       params: [
         { key: 'name', label: 'Nome', type: 'text', def: 'Tiago Gonçalves' },
         { key: 'role', label: 'Cargo (opcional)', type: 'text', def: '' },
         { key: 'align', label: 'Alinhamento', type: 'select', def: 'left', options: ['left','center','right'] },
         { key: 'duration', label: 'Auto-hide (segundos, 0=fixo)', type: 'number', def: '0' },
         { key: 'show', label: 'Mostrar (1/0)', type: 'select', def: '1', options: ['1','0'] },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#ef4444' },
+        { key: 'bg', label: 'Fundo', def: '#0b0f1a' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
@@ -544,12 +641,10 @@
     }
   ];
 
-  // ---------- DOM ----------
   const $list = document.getElementById('list');
   const $domain = document.getElementById('domain');
   const $toast = document.getElementById('toast');
 
-  // ---------- Helpers ----------
   function el(tag, attrs = {}, children = []){
     const node = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)){
@@ -595,6 +690,13 @@
     }
   }
 
+  function hexOrEmpty(v){
+    const s = String(v || '').trim();
+    if (!s) return '';
+    if (/^#[0-9a-fA-F]{6}$/.test(s)) return s;
+    return '';
+  }
+
   function buildCard(anim){
     const meta = el('div', { class: 'meta' }, [
       el('h2', { text: anim.name }),
@@ -629,6 +731,7 @@
 
     const form = el('div', { class: 'form' });
     const inputs = {};
+    const colorInputs = {};
 
     // Base URL editável
     const baseField = el('div', { class: 'field' }, [
@@ -639,29 +742,73 @@
     baseField.appendChild(baseInput);
     form.appendChild(baseField);
 
-    // Campos
+    // Campos normais
     (anim.params || []).forEach(p => {
       const field = el('div', { class: 'field' }, [ el('label', { text: p.label }) ]);
 
       let control;
       if (p.type === 'select'){
         control = el('select');
-        (p.options || []).forEach(opt => {
-          const o = el('option', { value: opt, text: opt });
-          control.appendChild(o);
-        });
+        (p.options || []).forEach(opt => control.appendChild(el('option', { value: opt, text: opt })));
         control.value = p.def ?? (p.options?.[0] ?? '');
       } else {
-        control = el('input', {
-          type: p.type || 'text',
-          value: (p.def ?? ''),
-        });
+        control = el('input', { type: p.type || 'text', value: (p.def ?? '') });
       }
 
       inputs[p.key] = control;
       field.appendChild(control);
       form.appendChild(field);
     });
+
+    // Secção CORES (se existir)
+    let colorsBlock = null;
+    if (Array.isArray(anim.colorParams) && anim.colorParams.length){
+      colorsBlock = el('div', {}, [
+        el('div', { class: 'sectionTitle', text: 'Cores (querystring)' })
+      ]);
+
+      const grid = el('div', { class: 'colorGrid' });
+
+      anim.colorParams.forEach(c => {
+        const field = el('div', { class: 'field' });
+        const lbl = el('label', { text: c.label });
+
+        const row = el('div', { class: 'colorRow' });
+        const sw = el('div', { class: 'swatch' });
+
+        const picker = el('input', { type: 'color', value: c.def || '#ffffff' });
+        const hex = el('input', { type: 'text', value: c.def || '#ffffff', placeholder: '#RRGGBB' });
+
+        function syncFromPicker(){
+          hex.value = picker.value;
+          sw.style.background = picker.value;
+        }
+        function syncFromHex(){
+          const v = hexOrEmpty(hex.value);
+          if (v){
+            picker.value = v;
+            sw.style.background = v;
+          }
+        }
+
+        picker.addEventListener('input', () => { syncFromPicker(); compute(); });
+        hex.addEventListener('input', () => { syncFromHex(); compute(); });
+
+        sw.style.background = picker.value;
+
+        colorInputs[c.key] = { picker, hex };
+
+        row.appendChild(sw);
+        row.appendChild(picker);
+        row.appendChild(hex);
+
+        field.appendChild(lbl);
+        field.appendChild(row);
+        grid.appendChild(field);
+      });
+
+      colorsBlock.appendChild(grid);
+    }
 
     const out = el('div', { class: 'out' }, [
       el('div', { class: 'label', text: 'Link final (Browser Source do OBS)' }),
@@ -683,17 +830,31 @@
 
     function getVals(){
       const vals = {};
-      (anim.params || []).forEach(p => {
-        vals[p.key] = (inputs[p.key]?.value ?? '');
-      });
+      (anim.params || []).forEach(p => vals[p.key] = (inputs[p.key]?.value ?? ''));
       return vals;
+    }
+
+    function getColors(){
+      const colors = {};
+      if (!anim.colorParams) return colors;
+      anim.colorParams.forEach(c => {
+        const h = colorInputs[c.key]?.hex?.value;
+        const v = hexOrEmpty(h);
+        if (v) colors[c.key] = v;
+      });
+      return colors;
     }
 
     function compute(){
       const domain = ($domain.value || '').trim() || 'http://localhost:3900';
       const base = (inputs.__baseUrl.value || anim.baseUrl).trim();
       const vals = getVals();
+      const colors = getColors();
+
       const query = anim.build(vals, domain);
+      // injeta cores
+      Object.entries(colors).forEach(([k,v]) => query.set(k, v));
+
       const url = buildUrl(base, query);
 
       outUrl.textContent = url;
@@ -740,6 +901,17 @@
         if (p.type === 'select') c.value = p.def ?? (p.options?.[0] ?? '');
         else c.value = (p.def ?? '');
       });
+      // reset cores
+      (anim.colorParams || []).forEach(c => {
+        const def = c.def || '#ffffff';
+        if (colorInputs[c.key]){
+          colorInputs[c.key].picker.value = def;
+          colorInputs[c.key].hex.value = def;
+          // swatch é primeiro child da row
+          const sw = colorInputs[c.key].picker.parentElement?.querySelector('.swatch');
+          if (sw) sw.style.background = def;
+        }
+      });
       compute();
       toast('Reset feito');
     });
@@ -751,9 +923,13 @@
       toast(res.via === 'fetch' ? 'Reset feito ✅' : 'Reset aberto (tab) ✅');
     });
 
-    const hint = el('div', { class: 'hint', html: 'Dica: no OBS, se estiveres a testar repetidamente, ativa “Refresh cache of current page”. Se a tua página estiver em <b>https</b> e o domain em <b>http</b>, alguns fetch podem ser bloqueados (mixed content).'});
+    const hint = el('div', { class: 'hint', html: 'Dica: Se a overlay <i>não</i> tiver suporte para estes parâmetros de cor, ela simplesmente ignora. Se quiseres que uma overlay reaja mesmo às cores, diz-me quais os nomes exactos dos params que ela usa e eu alinho aqui.' });
 
-    const card = el('div', { class: 'card' }, [ top, form, preview, out, hint ]);
+    const children = [ top, form ];
+    if (colorsBlock) children.push(colorsBlock);
+    children.push(preview, out, hint);
+
+    const card = el('div', { class: 'card' }, children);
 
     setTimeout(compute, 0);
     return card;
