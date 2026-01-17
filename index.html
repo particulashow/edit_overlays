@@ -542,6 +542,107 @@
         return q;
       }
     }
+    // =========================
+// Bullet Points (Dock) — até 10
+// =========================
+{
+  id: 'bullets_dock_10',
+  name: 'Bullet Points (Dock) — até 10 pontos',
+  desc: 'Lista em modo dock (OBS). Aceita item1…item10 via URL. Pontos vazios não aparecem. Sem agenda/footer.',
+  baseUrl: 'https://bullet-points-dock.vercel.app/',
+  tags: ['bullets', 'dock', 'URL', 'OBS'],
+  params: [
+    { key: 'title', label: 'Título (opcional)', placeholder: 'Agenda', type: 'text', def: '' },
+
+    { key: 'item1', label: 'Ponto 1', placeholder: 'Introdução', type: 'text', def: 'Introdução' },
+    { key: 'item2', label: 'Ponto 2', placeholder: 'Manifesto', type: 'text', def: 'Manifesto' },
+    { key: 'item3', label: 'Ponto 3', placeholder: 'Os Líderes', type: 'text', def: 'Os Líderes' },
+    { key: 'item4', label: 'Ponto 4', placeholder: 'Matrioska', type: 'text', def: 'Matrioska' },
+    { key: 'item5', label: 'Ponto 5', placeholder: 'O caminho', type: 'text', def: 'O caminho' },
+    { key: 'item6', label: 'Ponto 6', placeholder: '', type: 'text', def: '' },
+    { key: 'item7', label: 'Ponto 7', placeholder: '', type: 'text', def: '' },
+    { key: 'item8', label: 'Ponto 8', placeholder: '', type: 'text', def: '' },
+    { key: 'item9', label: 'Ponto 9', placeholder: '', type: 'text', def: '' },
+    { key: 'item10', label: 'Ponto 10', placeholder: '', type: 'text', def: '' },
+
+    { key: 'active', label: 'Ativo (1-10)', placeholder: '1', type: 'number', def: '1' },
+    { key: 'dock', label: 'Dock (tr/tl/br/bl)', placeholder: 'tr', type: 'text', def: 'tr' },
+
+    // cores: usa HEX sem "#"
+    { key: 'accent', label: 'Cor (hex sem #)', placeholder: 'FFB020', type: 'text', def: 'FFB020' },
+
+    { key: 'speed', label: 'Velocidade (0.4-2)', placeholder: '1', type: 'number', def: '1' },
+  ],
+  build: (vals, domain) => {
+    const q = new URLSearchParams();
+
+    if (vals.title) q.set('title', vals.title);
+
+    for (let i = 1; i <= 10; i++) {
+      const v = vals['item' + i];
+      if (v) q.set('item' + i, v);
+    }
+
+    if (vals.active) q.set('active', vals.active);
+    if (vals.dock) q.set('dock', vals.dock);
+    if (vals.accent) q.set('accent', vals.accent);
+    if (vals.speed) q.set('speed', vals.speed);
+
+    q.set('domain', domain);
+    return q;
+  }
+},
+
+// =========================
+// Bullet Points PRO — 1 ponto ativo
+// =========================
+{
+  id: 'bullets_pro_single_active',
+  name: 'Bullet Points PRO (1 ponto ativo)',
+  desc: 'Mostra apenas o ponto ativo (active=). Aceita item1…item10. Ideal para falares de um ponto de cada vez.',
+  baseUrl: 'https://bullet-points-pro.vercel.app/',
+  tags: ['bullets', 'pro', 'active', 'dock', 'OBS'],
+  params: [
+    { key: 'kicker', label: 'Kicker (opcional)', placeholder: 'PONTO ATUAL', type: 'text', def: '' },
+    { key: 'title', label: 'Título (opcional)', placeholder: 'Agenda', type: 'text', def: '' },
+
+    { key: 'item1', label: 'Ponto 1', placeholder: 'Introdução', type: 'text', def: 'Introdução' },
+    { key: 'item2', label: 'Ponto 2', placeholder: 'Manifesto', type: 'text', def: 'Manifesto' },
+    { key: 'item3', label: 'Ponto 3', placeholder: 'Os Líderes', type: 'text', def: 'Os Líderes' },
+    { key: 'item4', label: 'Ponto 4', placeholder: 'Matrioska', type: 'text', def: 'Matrioska' },
+    { key: 'item5', label: 'Ponto 5', placeholder: 'O caminho', type: 'text', def: 'O caminho' },
+    { key: 'item6', label: 'Ponto 6', placeholder: '', type: 'text', def: '' },
+    { key: 'item7', label: 'Ponto 7', placeholder: '', type: 'text', def: '' },
+    { key: 'item8', label: 'Ponto 8', placeholder: '', type: 'text', def: '' },
+    { key: 'item9', label: 'Ponto 9', placeholder: '', type: 'text', def: '' },
+    { key: 'item10', label: 'Ponto 10', placeholder: '', type: 'text', def: '' },
+
+    { key: 'active', label: 'Ativo (1-10)', placeholder: '1', type: 'number', def: '1' },
+    { key: 'dock', label: 'Dock (tr/tl/br/bl)', placeholder: 'tr', type: 'text', def: 'tr' },
+    { key: 'accent', label: 'Cor (hex sem #)', placeholder: 'FFB020', type: 'text', def: 'FFB020' },
+    { key: 'speed', label: 'Velocidade (0.4-2)', placeholder: '1', type: 'number', def: '1' },
+  ],
+  build: (vals, domain) => {
+    const q = new URLSearchParams();
+
+    if (vals.kicker) q.set('kicker', vals.kicker);
+    if (vals.title) q.set('title', vals.title);
+
+    for (let i = 1; i <= 10; i++) {
+      const v = vals['item' + i];
+      if (v) q.set('item' + i, v);
+    }
+
+    if (vals.active) q.set('active', vals.active);
+    if (vals.dock) q.set('dock', vals.dock);
+    if (vals.accent) q.set('accent', vals.accent);
+    if (vals.speed) q.set('speed', vals.speed);
+
+    q.set('domain', domain);
+    return q;
+  }
+}
+
   ];
 
   // ---------- DOM ----------
