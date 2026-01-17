@@ -987,4 +987,28 @@
       toast('Reset feito');
     });
 
-    btnResetWordc
+    btnResetWordcloud.addEventListener('click', async () => {
+      const { domain, vals } = compute();
+      const words = (typeof anim.resetWords === 'function') ? (anim.resetWords(vals) || '') : '';
+      const res = await clearChat(domain, words);
+      toast(res.via === 'fetch' ? 'Reset feito ✅' : 'Reset aberto (tab) ✅');
+    });
+
+    const hint = el('div', { class: 'hint', html: 'Nota: se a overlay <i>não</i> suportar estes parâmetros de cor, ela ignora. Se me disseres os nomes exactos dos params que cada overlay usa, eu mapeio aqui.' });
+
+    const children = [ top, form ];
+    if (colorsBlock) children.push(colorsBlock);
+    children.push(preview, out, hint);
+
+    const card = el('div', { class: 'card' }, children);
+
+    setTimeout(compute, 0);
+    return card;
+  }
+
+  // Render
+  ANIMS.forEach(a => $list.appendChild(buildCard(a)));
+</script>
+
+</body>
+</html>
