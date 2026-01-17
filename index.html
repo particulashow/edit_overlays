@@ -717,6 +717,43 @@
         if (vals.active) q.set('active', vals.active);
         if (vals.dock) q.set('dock', vals.dock);
         if (vals.speed) q.set('speed', vals.speed);
+        // sugestão: algumas versões usam este flag para “single view”
+        q.set('single', '1');
+        q.set('domain', domain);
+        return q;
+      }
+    },
+
+    {
+      id: 'bullets_single_focus',
+      name: 'Bullet (Single Focus) — 1 ponto em destaque',
+      desc: 'Versão “single bullet”: mostra só 1 ponto (o ativo). Ideal para pores “o tema do momento” em overlay.',
+      baseUrl: 'https://bulletpoints.vercel.app/',
+      tags: ['bullet', 'single', 'focus', 'OBS'],
+      params: [
+        { key: 'kicker', label: 'Kicker (opcional)', type: 'text', def: '' },
+        { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
+        { key: 'item', label: 'Bullet (texto)', type: 'text', def: 'Introdução' },
+        { key: 'dock', label: 'Dock (tr/tl/br/bl)', type: 'select', def: 'tr', options: ['tr','tl','br','bl'] },
+        { key: 'speed', label: 'Velocidade (0.4-2)', type: 'number', def: '1' },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#f59e0b' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        if (vals.kicker) q.set('kicker', vals.kicker);
+        if (vals.title) q.set('title', vals.title);
+        // compatibilidade: passa como item1 também
+        if (vals.item) {
+          q.set('item', vals.item);
+          q.set('item1', vals.item);
+        }
+        q.set('active', '1');
+        if (vals.dock) q.set('dock', vals.dock);
+        if (vals.speed) q.set('speed', vals.speed);
+        q.set('single', '1');
         q.set('domain', domain);
         return q;
       }
