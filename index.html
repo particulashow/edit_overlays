@@ -309,9 +309,6 @@
   // - Controlo de CORES: injeta parâmetros no URL (accent/bg/text etc.)
   // =========================
 
-  // Ajusta estes nomes de parâmetros para baterem certo com cada overlay.
-  // Se uma overlay não usar, ignora e não parte nada.
-
   const ANIMS = [
     {
       id: 'votacao_ao_vivo_sim_nao',
@@ -608,7 +605,37 @@
         q.set('domain', domain);
         return q;
       }
-    },$1,
+    },
+
+    {
+      id: 'nome_red',
+      name: 'Lower Third (Nome) — versão Red',
+      desc: 'Versão simples focada no nome. Fundo transparente.',
+      baseUrl: 'https://nome-red.vercel.app/',
+      tags: ['lower third', 'nome'],
+      params: [
+        { key: 'name', label: 'Nome', type: 'text', def: 'Tiago Gonçalves' },
+        { key: 'role', label: 'Cargo (opcional)', type: 'text', def: '' },
+        { key: 'align', label: 'Alinhamento', type: 'select', def: 'left', options: ['left','center','right'] },
+        { key: 'duration', label: 'Auto-hide (segundos, 0=fixo)', type: 'number', def: '0' },
+        { key: 'show', label: 'Mostrar (1/0)', type: 'select', def: '1', options: ['1','0'] },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#ef4444' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'bg', label: 'Fundo', def: '#0b0f1a' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        q.set('name', vals.name);
+        if (vals.role) q.set('role', vals.role);
+        q.set('align', vals.align);
+        q.set('duration', vals.duration);
+        q.set('show', vals.show);
+        q.set('domain', domain);
+        return q;
+      }
+    },
 
     // ===== NOVAS (BULLET POINTS) =====
     {
@@ -695,6 +722,22 @@
       }
     }
   ];
+
+  // ----------------------
+  // "Testes" simples (runtime checks)
+  // ----------------------
+  (function runSmokeTests(){
+    try {
+      console.assert(Array.isArray(ANIMS), 'ANIMS deve ser um array');
+      console.assert(ANIMS.length > 0, 'ANIMS não pode estar vazio');
+      const hasBad = ANIMS.some(x => !x || typeof x !== 'object');
+      console.assert(!hasBad, 'ANIMS contém entradas inválidas (undefined/null)');
+      const hasBuildMissing = ANIMS.some(x => typeof x.build !== 'function');
+      console.assert(!hasBuildMissing, 'Há overlays sem função build()');
+    } catch(e){
+      console.warn('Smoke tests falharam:', e);
+    }
+  })();
 
   const $list = document.getElementById('list');
   const $domain = document.getElementById('domain');
@@ -851,7 +894,7 @@
 
         sw.style.background = picker.value;
 
-        colorInputs[c.key] = { picker, hex };
+        colorInputs[c.key] = { picker, hex, sw };
 
         row.appendChild(sw);
         row.appendChild(picker);
@@ -907,7 +950,6 @@
       const colors = getColors();
 
       const query = anim.build(vals, domain);
-      // injeta cores
       Object.entries(colors).forEach(([k,v]) => query.set(k, v));
 
       const url = buildUrl(base, query);
@@ -956,17 +998,16 @@
         if (p.type === 'select') c.value = p.def ?? (p.options?.[0] ?? '');
         else c.value = (p.def ?? '');
       });
-      // reset cores
+
       (anim.colorParams || []).forEach(c => {
         const def = c.def || '#ffffff';
         if (colorInputs[c.key]){
           colorInputs[c.key].picker.value = def;
           colorInputs[c.key].hex.value = def;
-          // swatch é primeiro child da row
-          const sw = colorInputs[c.key].picker.parentElement?.querySelector('.swatch');
-          if (sw) sw.style.background = def;
+          colorInputs[c.key].sw.style.background = def;
         }
       });
+
       compute();
       toast('Reset feito');
     });
@@ -978,7 +1019,7 @@
       toast(res.via === 'fetch' ? 'Reset feito ✅' : 'Reset aberto (tab) ✅');
     });
 
-    const hint = el('div', { class: 'hint', html: 'Dica: Se a overlay <i>não</i> tiver suporte para estes parâmetros de cor, ela simplesmente ignora. Se quiseres que uma overlay reaja mesmo às cores, diz-me quais os nomes exactos dos params que ela usa e eu alinho aqui.' });
+    const hint = el('div', { class: 'hint', html: 'Dica: Se a overlay <i>não</i> tiver suporte para estes parâmetros de cor, ela ignora. Se quiseres que uma overlay reaja mesmo às cores, diz-me quais os nomes exactos dos params que ela usa e eu alinho aqui.' });
 
     const children = [ top, form ];
     if (colorsBlock) children.push(colorsBlock);
