@@ -287,7 +287,7 @@
 <header>
   <div>
     <h1>Página de Testes de Overlays (OBS)</h1>
-    <div class="sub">Escolhe uma animação, preenche os campos e copia o link final. Agora também podes injectar parâmetros de cor (quando fizer sentido) sem mexer no código da overlay.</div>
+    <div class="sub">Escolhe uma animação, preenche os campos e copia o link final. Também podes injectar parâmetros de cor (quando fizer sentido) sem mexer no código da overlay.</div>
   </div>
 
   <div class="pill">
@@ -306,7 +306,7 @@
   // - Gera links com querystring
   // - Preview responsivo dentro do card
   // - Reset wordcloud via /clear-chat
-  // - Controlo de CORES: injeta parâmetros no URL (accent/bg/text etc.)
+  // - CORES: injeta params no URL (accent/bg/text etc.)
   // =========================
 
   const ANIMS = [
@@ -320,7 +320,6 @@
         { key: 'yes', label: 'Texto Sim', type: 'text', def: 'Sim' },
         { key: 'no', label: 'Texto Não', type: 'text', def: 'Não' },
       ],
-      // Cores genéricas (se a overlay suportar)
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#60a5fa' },
         { key: 'text', label: 'Texto', def: '#ffffff' },
@@ -572,11 +571,10 @@
       resetWords: () => `A,B`
     },
 
-    // ===== NOVAS (NOME / AVATAR) =====
     {
       id: 'nome_e_avatar',
       name: 'Lower Third (Nome + Avatar)',
-      desc: 'Lower third com avatar via URL. Tema e cores (accent/text/bg) por querystring.',
+      desc: 'Lower third com avatar via URL. Tema e cores por querystring.',
       baseUrl: 'https://nomeeavatar.vercel.app/',
       tags: ['lower third', 'nome', 'avatar'],
       params: [
@@ -637,15 +635,13 @@
       }
     },
 
-    // ===== NOVAS (BULLET POINTS) =====
     {
       id: 'bullets_dock_10',
       name: 'Bullet Points (Dock) — até 10 pontos',
-      desc: 'Lista em modo dock (OBS). Aceita item1…item10 via URL. Pontos vazios não aparecem. Sem agenda/footer.',
+      desc: 'Lista em modo dock. Aceita item1…item10. Se estiver vazio, não aparece. Sem agenda/footer.',
       baseUrl: 'https://bulletpoints.vercel.app/',
-      tags: ['bullets', 'dock', 'URL', 'OBS'],
+      tags: ['bullets', 'dock', 'OBS'],
       params: [
-        { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
         { key: 'item1', label: 'Ponto 1', type: 'text', def: 'Introdução' },
         { key: 'item2', label: 'Ponto 2', type: 'text', def: 'Manifesto' },
         { key: 'item3', label: 'Ponto 3', type: 'text', def: 'Os Líderes' },
@@ -656,7 +652,6 @@
         { key: 'item8', label: 'Ponto 8', type: 'text', def: '' },
         { key: 'item9', label: 'Ponto 9', type: 'text', def: '' },
         { key: 'item10', label: 'Ponto 10', type: 'text', def: '' },
-        { key: 'active', label: 'Ativo (1-10)', type: 'number', def: '1' },
         { key: 'dock', label: 'Dock (tr/tl/br/bl)', type: 'select', def: 'tr', options: ['tr','tl','br','bl'] },
         { key: 'speed', label: 'Velocidade (0.4-2)', type: 'number', def: '1' },
       ],
@@ -666,12 +661,10 @@
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        if (vals.title) q.set('title', vals.title);
         for (let i = 1; i <= 10; i++) {
           const v = vals['item' + i];
           if (v) q.set('item' + i, v);
         }
-        if (vals.active) q.set('active', vals.active);
         if (vals.dock) q.set('dock', vals.dock);
         if (vals.speed) q.set('speed', vals.speed);
         q.set('domain', domain);
@@ -681,13 +674,11 @@
 
     {
       id: 'single_point_active',
-      name: 'Single Point (1 ponto ativo)',
-      desc: 'Mostra apenas um ponto em destaque (single). Ideal para foco total num único tema.',
+      name: 'Single Bullet (ponto único)',
+      desc: 'Mostra apenas 1 ponto em destaque. Ideal para “tema do momento”.',
       baseUrl: 'https://singlepoint.vercel.app/',
-      tags: ['single', 'bullet', 'focus', 'OBS'],
+      tags: ['single', 'bullet', 'OBS'],
       params: [
-        { key: 'kicker', label: 'Kicker (opcional)', type: 'text', def: '' },
-        { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
         { key: 'text', label: 'Texto do ponto', type: 'text', def: 'Introdução' },
         { key: 'dock', label: 'Dock (tr/tl/br/bl)', type: 'select', def: 'tr', options: ['tr','tl','br','bl'] },
         { key: 'speed', label: 'Velocidade (0.4-2)', type: 'number', def: '1' }
@@ -699,8 +690,6 @@
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        if (vals.kicker) q.set('kicker', vals.kicker);
-        if (vals.title) q.set('title', vals.title);
         q.set('text', vals.text);
         if (vals.dock) q.set('dock', vals.dock);
         if (vals.speed) q.set('speed', vals.speed);
@@ -708,90 +697,18 @@
         return q;
       }
     },
-        { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
-        { key: 'item1', label: 'Ponto 1', type: 'text', def: 'Introdução' },
-        { key: 'item2', label: 'Ponto 2', type: 'text', def: 'Manifesto' },
-        { key: 'item3', label: 'Ponto 3', type: 'text', def: 'Os Líderes' },
-        { key: 'item4', label: 'Ponto 4', type: 'text', def: 'Matrioska' },
-        { key: 'item5', label: 'Ponto 5', type: 'text', def: 'O caminho' },
-        { key: 'item6', label: 'Ponto 6', type: 'text', def: '' },
-        { key: 'item7', label: 'Ponto 7', type: 'text', def: '' },
-        { key: 'item8', label: 'Ponto 8', type: 'text', def: '' },
-        { key: 'item9', label: 'Ponto 9', type: 'text', def: '' },
-        { key: 'item10', label: 'Ponto 10', type: 'text', def: '' },
-        { key: 'active', label: 'Ativo (1-10)', type: 'number', def: '1' },
-        { key: 'dock', label: 'Dock (tr/tl/br/bl)', type: 'select', def: 'tr', options: ['tr','tl','br','bl'] },
-        { key: 'speed', label: 'Velocidade (0.4-2)', type: 'number', def: '1' },
-      ],
-      colorParams: [
-        { key: 'accent', label: 'Accent', def: '#f59e0b' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        if (vals.kicker) q.set('kicker', vals.kicker);
-        if (vals.title) q.set('title', vals.title);
-        for (let i = 1; i <= 10; i++) {
-          const v = vals['item' + i];
-          if (v) q.set('item' + i, v);
-        }
-        if (vals.active) q.set('active', vals.active);
-        if (vals.dock) q.set('dock', vals.dock);
-        if (vals.speed) q.set('speed', vals.speed);
-        // sugestão: algumas versões usam este flag para “single view”
-        q.set('single', '1');
-        q.set('domain', domain);
-        return q;
-      }
-    },
-
-    {
-      id: 'bullets_single_focus',
-      name: 'Bullet (Single Focus) — 1 ponto em destaque',
-      desc: 'Versão “single bullet”: mostra só 1 ponto (o ativo). Ideal para pores “o tema do momento” em overlay.',
-      baseUrl: 'https://bulletpoints.vercel.app/',
-      tags: ['bullet', 'single', 'focus', 'OBS'],
-      params: [
-        { key: 'kicker', label: 'Kicker (opcional)', type: 'text', def: '' },
-        { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
-        { key: 'item', label: 'Bullet (texto)', type: 'text', def: 'Introdução' },
-        { key: 'dock', label: 'Dock (tr/tl/br/bl)', type: 'select', def: 'tr', options: ['tr','tl','br','bl'] },
-        { key: 'speed', label: 'Velocidade (0.4-2)', type: 'number', def: '1' },
-      ],
-      colorParams: [
-        { key: 'accent', label: 'Accent', def: '#f59e0b' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        if (vals.kicker) q.set('kicker', vals.kicker);
-        if (vals.title) q.set('title', vals.title);
-        // compatibilidade: passa como item1 também
-        if (vals.item) {
-          q.set('item', vals.item);
-          q.set('item1', vals.item);
-        }
-        q.set('active', '1');
-        if (vals.dock) q.set('dock', vals.dock);
-        if (vals.speed) q.set('speed', vals.speed);
-        q.set('single', '1');
-        q.set('domain', domain);
-        return q;
-      }
-    }
   ];
 
   // ----------------------
-  // "Testes" simples (runtime checks)
+  // Smoke tests (runtime)
   // ----------------------
   (function runSmokeTests(){
     try {
       console.assert(Array.isArray(ANIMS), 'ANIMS deve ser um array');
       console.assert(ANIMS.length > 0, 'ANIMS não pode estar vazio');
-      const hasBad = ANIMS.some(x => !x || typeof x !== 'object');
-      console.assert(!hasBad, 'ANIMS contém entradas inválidas (undefined/null)');
-      const hasBuildMissing = ANIMS.some(x => typeof x.build !== 'function');
-      console.assert(!hasBuildMissing, 'Há overlays sem função build()');
+      console.assert(ANIMS.every(x => x && typeof x === 'object'), 'ANIMS contém entradas inválidas');
+      console.assert(ANIMS.every(x => typeof x.build === 'function'), 'Há overlays sem função build()');
+      console.assert(ANIMS.every(x => typeof x.baseUrl === 'string' && x.baseUrl.length), 'Há overlays sem baseUrl');
     } catch(e){
       console.warn('Smoke tests falharam:', e);
     }
@@ -1070,28 +987,4 @@
       toast('Reset feito');
     });
 
-    btnResetWordcloud.addEventListener('click', async () => {
-      const { domain, vals } = compute();
-      const words = (typeof anim.resetWords === 'function') ? (anim.resetWords(vals) || '') : '';
-      const res = await clearChat(domain, words);
-      toast(res.via === 'fetch' ? 'Reset feito ✅' : 'Reset aberto (tab) ✅');
-    });
-
-    const hint = el('div', { class: 'hint', html: 'Dica: Se a overlay <i>não</i> tiver suporte para estes parâmetros de cor, ela ignora. Se quiseres que uma overlay reaja mesmo às cores, diz-me quais os nomes exactos dos params que ela usa e eu alinho aqui.' });
-
-    const children = [ top, form ];
-    if (colorsBlock) children.push(colorsBlock);
-    children.push(preview, out, hint);
-
-    const card = el('div', { class: 'card' }, children);
-
-    setTimeout(compute, 0);
-    return card;
-  }
-
-  // Render
-  ANIMS.forEach(a => $list.appendChild(buildCard(a)));
-</script>
-
-</body>
-</html>
+    btnResetWordc
