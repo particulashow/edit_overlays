@@ -680,13 +680,34 @@
     },
 
     {
-      id: 'bullets_pro_single_active',
-      name: 'Bullet Points PRO (1 ponto ativo)',
-      desc: 'Mostra apenas o ponto ativo (active=). Aceita item1…item10. Ideal para falares de um ponto de cada vez.',
-      baseUrl: 'https://bulletpoints.vercel.app/',
-      tags: ['bullets', 'pro', 'active', 'OBS'],
+      id: 'single_point_active',
+      name: 'Single Point (1 ponto ativo)',
+      desc: 'Mostra apenas um ponto em destaque (single). Ideal para foco total num único tema.',
+      baseUrl: 'https://singlepoint.vercel.app/',
+      tags: ['single', 'bullet', 'focus', 'OBS'],
       params: [
         { key: 'kicker', label: 'Kicker (opcional)', type: 'text', def: '' },
+        { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
+        { key: 'text', label: 'Texto do ponto', type: 'text', def: 'Introdução' },
+        { key: 'dock', label: 'Dock (tr/tl/br/bl)', type: 'select', def: 'tr', options: ['tr','tl','br','bl'] },
+        { key: 'speed', label: 'Velocidade (0.4-2)', type: 'number', def: '1' }
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#f59e0b' },
+        { key: 'textColor', label: 'Texto', def: '#ffffff' },
+        { key: 'bg', label: 'Fundo', def: '#0b0f1a' }
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        if (vals.kicker) q.set('kicker', vals.kicker);
+        if (vals.title) q.set('title', vals.title);
+        q.set('text', vals.text);
+        if (vals.dock) q.set('dock', vals.dock);
+        if (vals.speed) q.set('speed', vals.speed);
+        q.set('domain', domain);
+        return q;
+      }
+    },
         { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
         { key: 'item1', label: 'Ponto 1', type: 'text', def: 'Introdução' },
         { key: 'item2', label: 'Ponto 2', type: 'text', def: 'Manifesto' },
