@@ -399,11 +399,11 @@
     {
       id: 'quizz4_4op',
       name: 'Quizz (4 opções)',
-      desc: 'Pergunta + 4 respostas com contagem. Aceita votos A/B/C/D. Lê via wordcloud.',
+      desc: 'Pergunta + 4 respostas com contagem. Aceita votos A/B/C/D. Lê via wordcloud. (Nota: esta versão usa "title", não "question".)',
       baseUrl: 'https://quizz4-beta.vercel.app/',
       tags: ['A/B/C/D', 'barras', 'wordcloud'],
       params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
+        { key: 'title', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
         { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
         { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
         { key: 'c', label: 'Resposta C', type: 'text', def: 'Opção C' },
@@ -415,7 +415,7 @@
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        q.set('question', vals.question);
+        q.set('title', vals.title);
         q.set('a', vals.a);
         q.set('b', vals.b);
         q.set('c', vals.c);
