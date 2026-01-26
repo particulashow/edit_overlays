@@ -12,6 +12,7 @@
       --muted: rgba(255,255,255,0.68);
       --good:#22c55e;
       --warn:#f59e0b;
+      --accent:#60a5fa;
     }
     *{box-sizing:border-box}
     body{
@@ -27,7 +28,7 @@
 
     header{
       max-width: 1320px;
-      margin: 0 auto 18px;
+      margin: 0 auto 12px;
       display:flex;
       gap: 16px;
       align-items: flex-end;
@@ -58,9 +59,98 @@
       font-size: 13px;
     }
 
-    .wrap{
+    /* NAV CATEGORIAS */
+    .nav{
+      max-width: 1320px;
+      margin: 0 auto 18px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+    }
+    .nav a{
+      text-decoration:none;
+      color: var(--text);
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: .18px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--stroke);
+      background: rgba(0,0,0,0.18);
+      opacity: .92;
+    }
+    .nav a:hover{ opacity: 1; border-color: rgba(255,255,255,0.22); }
+    .nav .dot{
+      width: 8px; height: 8px; border-radius: 999px;
+      background: var(--accent);
+      display:inline-block; margin-right: 8px;
+      box-shadow: 0 0 0 6px rgba(96,165,250,0.10);
+      vertical-align: middle;
+    }
+
+    /* SECTIONS */
+    .sections{
       max-width: 1320px;
       margin: 0 auto;
+      display:flex;
+      flex-direction:column;
+      gap: 18px;
+    }
+
+    .section{
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.10);
+      border-radius: 20px;
+      padding: 14px;
+      box-shadow: 0 22px 70px rgba(0,0,0,0.20);
+    }
+
+    .sectionHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 6px 4px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 12px;
+    }
+
+    .sectionTitle{
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: .24px;
+      font-weight: 1000;
+      text-transform: uppercase;
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .sectionTitle .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.18);
+      color: rgba(255,255,255,0.85);
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing:.2px;
+    }
+
+    .sectionDesc{
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      max-width: 920px;
+      margin: 0;
+    }
+
+    /* GRID 2 COLUNAS */
+    .wrap{
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
@@ -170,7 +260,7 @@
       font-size: 14px;
     }
 
-    .sectionTitle{
+    .sectionMini{
       margin: 2px 0 -2px;
       font-size: 12px;
       color: rgba(255,255,255,0.78);
@@ -286,9 +376,7 @@
   <div>
     <h1>Página de Testes de Overlays (OBS)</h1>
     <div class="sub">
-      Escolhe uma animação, preenche os campos e copia o link final.
-      O “Domain” é o servidor do Social Stream Ninja/wordcloud (ex: localhost:3900).
-      Usa “Reset wordcloud” para limpar votos/entradas.
+      Escolhe uma categoria, ajusta os campos e copia o link final. A página tenta mapear parâmetros “diferentes” com aliases (ex.: title/question, left/optionA, etc.).
     </div>
   </div>
 
@@ -298,43 +386,61 @@
   </div>
 </header>
 
-<div class="wrap" id="list"></div>
+<div class="nav" id="nav"></div>
+
+<div class="sections" id="sections"></div>
 
 <div class="toast" id="toast">Copiado ✅</div>
 
 <script>
-  // =========================
-  // Página de Testes (OBS)
-  // =========================
+  // ============================================================
+  // Página de Testes (OBS) - por categorias
+  // - Gera links com querystring
+  // - Preview responsivo dentro do card
+  // - Reset wordcloud via /clear-chat (quando aplicável)
+  // - Cores por querystring (se a overlay suportar)
+  // - Aliases para reduzir “não assume títulos/opções”
+  // ============================================================
+
+  const CATS = [
+    { id:'votacoes',  title:'Votações & Gráficos', desc:'Leitura directa do chat com visual “on-air”.', badge:'AO VIVO' },
+    { id:'quizz',     title:'Quizz & Decisão',     desc:'Perguntas e opções A/B/C/D (ou variações) e balança A/B.', badge:'RITMO' },
+    { id:'dinamica',  title:'Energia & Dinâmica',  desc:'Medidores, delay e reacções para dar pulso à live.', badge:'LIVE' },
+    { id:'jogos',     title:'Jogos & Criativo',    desc:'Interacções lúdicas para segurar atenção.', badge:'JOGO' },
+    { id:'estrutura', title:'Conteúdo & Estrutura',desc:'Bullets e pontos para guiar o discurso.', badge:'TEMA' },
+    { id:'branding',  title:'Branding & Info',     desc:'Lower thirds e cartões de URL.', badge:'MARCA' },
+  ];
+
+  // Helpers para aliases (manda vários params para cobrir implementações diferentes)
+  function setAny(q, keys, val){
+    const v = String(val ?? '').trim();
+    if (!v) return;
+    keys.forEach(k => q.set(k, v));
+  }
 
   const ANIMS = [
-    // -------------------------
-    // VOTAÇÕES
-    // -------------------------
+    // =======================
+    // VOTAÇÕES & GRÁFICOS
+    // =======================
     {
-      id: 'votacao_ao_vivo_sim_nao_donut',
-      name: 'Votação ao Vivo (Sim / Não) — donut',
-      desc: 'Donut (1 roda, 2 opções). Params: yes/no (+ opcional title). Lê via wordcloud.',
+      cat: 'votacoes',
+      id: 'votacao_ao_vivo_donut_sim_nao',
+      name: 'Votação ao Vivo (Donut) — Sim/Não',
+      desc: 'Formato circular minimal. Parametriza SIM/NÃO e cores (quando suportado).',
       baseUrl: 'https://votacao-ao-vivo.vercel.app/',
-      tags: ['Sim/Não', 'donut', 'wordcloud'],
+      tags: ['donut', 'Sim/Não', 'wordcloud'],
       params: [
-        { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
-        { key: 'yes', label: 'Texto Sim', type: 'text', def: 'Sim' },
-        { key: 'no', label: 'Texto Não', type: 'text', def: 'Não' },
-        { key: 'yesWords', label: 'Sinónimos Sim (csv opcional)', type: 'text', def: '' },
-        { key: 'noWords', label: 'Sinónimos Não (csv opcional)', type: 'text', def: '' },
+        { key: 'yes', label: 'Texto SIM', type: 'text', def: 'Sim' },
+        { key: 'no',  label: 'Texto NÃO', type: 'text', def: 'Não' },
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#60a5fa' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'text',   label: 'Texto',  def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        if (vals.title) q.set('title', vals.title);
-        q.set('yes', vals.yes);
-        q.set('no', vals.no);
-        if (vals.yesWords) q.set('yesWords', vals.yesWords);
-        if (vals.noWords) q.set('noWords', vals.noWords);
+        setAny(q, ['yes'], vals.yes);
+        setAny(q, ['no'],  vals.no);
         q.set('domain', domain);
         return q;
       },
@@ -342,41 +448,41 @@
     },
 
     {
-      id: 'votacao_circular_transparente_nova',
-      name: 'Votação Circular (nova) — transparente (Sim/Não)',
-      desc: 'Só o donut + contagens (sem fundo). Substitui baseUrl quando estiver publicada.',
-      baseUrl: 'https://TODO-SEU-URL.vercel.app/',
-      tags: ['Sim/Não', 'donut', 'transparente', 'wordcloud'],
+      cat: 'votacoes',
+      id: 'particulashow_votacoes',
+      name: 'PartículaShow — Votações (4 opções)',
+      desc: 'Votações do PartículaShow (A/B/C/D).',
+      baseUrl: 'https://particulashow-votacoes.vercel.app/',
+      tags: ['A/B/C/D', 'votos', 'wordcloud'],
       params: [
-        { key: 'yes', label: 'Texto Sim', type: 'text', def: 'Sim' },
-        { key: 'no', label: 'Texto Não', type: 'text', def: 'Não' },
-        { key: 'yesWords', label: 'Sinónimos Sim (csv opcional)', type: 'text', def: '' },
-        { key: 'noWords', label: 'Sinónimos Não (csv opcional)', type: 'text', def: '' },
+        { key: 'title', label: 'Título', type: 'text', def: 'Qual escolhes?' },
+        { key: 'a', label: 'Opção A', type: 'text', def: 'Opção A' },
+        { key: 'b', label: 'Opção B', type: 'text', def: 'Opção B' },
+        { key: 'c', label: 'Opção C', type: 'text', def: 'Opção C' },
+        { key: 'd', label: 'Opção D', type: 'text', def: 'Opção D' },
       ],
       colorParams: [
-        { key: 'accent', label: 'Cor Sim (accent)', def: '#22c55e' },
-        { key: 'noColor', label: 'Cor Não', def: '#ef4444' },
-        { key: 'track', label: 'Track', def: '#ffffff' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'accent', label: 'Accent', def: '#60a5fa' },
+        { key: 'track',  label: 'Track',  def: '#1b2335' },
+        { key: 'text',   label: 'Texto',  def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        q.set('yes', vals.yes);
-        q.set('no', vals.no);
-        if (vals.yesWords) q.set('yesWords', vals.yesWords);
-        if (vals.noWords) q.set('noWords', vals.noWords);
+        setAny(q, ['title','question'], vals.title);
+        q.set('a', vals.a); q.set('b', vals.b); q.set('c', vals.c); q.set('d', vals.d);
         q.set('domain', domain);
         return q;
       },
-      resetWords: () => `Sim,Não,A,B`
+      resetWords: () => `A,B,C,D`
     },
 
     {
-      id: 'votacoes_poll4_abcd',
-      name: 'Votações (A/B/C/D) — contadores + barras (vertical)',
-      desc: 'Poll 4 opções (A/B/C/D). Params: title,a,b,c,d. Lê via wordcloud (A,B,C,D).',
-      baseUrl: 'https://votacoes.vercel.app/',
-      tags: ['A/B/C/D', 'barras', 'wordcloud'],
+      cat: 'votacoes',
+      id: 'grafico4_flame',
+      name: 'Gráfico 4 (Flame) — Barras verticais',
+      desc: 'Gráfico vertical 4 opções (conta votos).',
+      baseUrl: 'https://grafico4-flame.vercel.app/',
+      tags: ['A/B/C/D', 'barras', 'votos'],
       params: [
         { key: 'title', label: 'Título', type: 'text', def: 'Qual escolhes?' },
         { key: 'a', label: 'Opção A', type: 'text', def: 'Opção A' },
@@ -387,61 +493,139 @@
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#60a5fa' },
-        { key: 'track', label: 'Track', def: '#1b2335' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'track',  label: 'Track',  def: '#1b2335' },
+        { key: 'text',   label: 'Texto',  def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('a', vals.a);
-        q.set('b', vals.b);
-        q.set('c', vals.c);
-        q.set('d', vals.d);
-        if (vals.leader) q.set('leader', vals.leader);
+        setAny(q, ['title','question'], vals.title);
+        q.set('a', vals.a); q.set('b', vals.b); q.set('c', vals.c); q.set('d', vals.d);
+        setAny(q, ['leader'], vals.leader);
         q.set('domain', domain);
         return q;
       },
       resetWords: () => `A,B,C,D`
     },
 
-    // -------------------------
-    // QUIZZES
-    // -------------------------
+    // =======================
+    // QUIZZ & DECISÃO
+    // =======================
     {
-      id: 'quizz_relampago_2op',
-      name: 'Quizz Relâmpago (2 opções)',
-      desc: 'Pergunta + 2 respostas. Aceita votos A/B (ou keyA/keyB). Lê via wordcloud.',
-      baseUrl: 'https://quizz-relampago.vercel.app/',
-      tags: ['A/B', 'barras', 'wordcloud'],
+      cat: 'quizz',
+      id: 'quizz2b',
+      name: 'Quizz 2B (A/B)',
+      desc: '2 opções no estilo “b”.',
+      baseUrl: 'https://quizz2b.vercel.app/',
+      tags: ['A/B', 'quizz', 'wordcloud'],
       params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
+        { key: 'title', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
         { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
         { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
-        { key: 'keyA', label: 'Voto A (tecla)', type: 'text', def: 'A' },
-        { key: 'keyB', label: 'Voto B (tecla)', type: 'text', def: 'B' },
       ],
       colorParams: [
-        { key: 'aColor', label: 'Cor A', def: '#22c55e' },
-        { key: 'bColor', label: 'Cor B', def: '#3b82f6' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'accent', label: 'Accent', def: '#f59e0b' },
+        { key: 'track',  label: 'Track',  def: 'rgba(255,255,255,.12)' },
+        { key: 'text',   label: 'Texto',  def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        q.set('question', vals.question);
-        q.set('a', vals.a);
-        q.set('b', vals.b);
-        q.set('keyA', vals.keyA);
-        q.set('keyB', vals.keyB);
+        setAny(q, ['title','question'], vals.title);
+        q.set('a', vals.a); q.set('b', vals.b);
         q.set('domain', domain);
         return q;
       },
-      resetWords: (vals) => `${vals.keyA},${vals.keyB}`
+      resetWords: () => `A,B`
     },
 
     {
-      id: 'quizz4_4op',
-      name: 'Quizz (4 opções) — beta',
-      desc: 'Pergunta + 4 respostas. Esta versão usa "title" (não "question"). Lê A/B/C/D via wordcloud.',
+      cat: 'quizz',
+      id: 'quizz3b',
+      name: 'Quizz 3B (A/B/C)',
+      desc: '3 opções no estilo “b”.',
+      baseUrl: 'https://quizz3b.vercel.app/',
+      tags: ['A/B/C', 'quizz', 'wordcloud'],
+      params: [
+        { key: 'title', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
+        { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
+        { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
+        { key: 'c', label: 'Resposta C', type: 'text', def: 'Opção C' },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#f59e0b' },
+        { key: 'track',  label: 'Track',  def: 'rgba(255,255,255,.12)' },
+        { key: 'text',   label: 'Texto',  def: '#ffffff' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        setAny(q, ['title','question'], vals.title);
+        q.set('a', vals.a); q.set('b', vals.b); q.set('c', vals.c);
+        q.set('domain', domain);
+        return q;
+      },
+      resetWords: () => `A,B,C`
+    },
+
+    {
+      cat: 'quizz',
+      id: 'quizz4b',
+      name: 'Quizz 4B (A/B/C/D)',
+      desc: '4 opções no estilo “b”.',
+      baseUrl: 'https://quizz4b.vercel.app/',
+      tags: ['A/B/C/D', 'quizz', 'wordcloud'],
+      params: [
+        { key: 'title', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
+        { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
+        { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
+        { key: 'c', label: 'Resposta C', type: 'text', def: 'Opção C' },
+        { key: 'd', label: 'Resposta D', type: 'text', def: 'Opção D' },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#f59e0b' },
+        { key: 'track',  label: 'Track',  def: 'rgba(255,255,255,.12)' },
+        { key: 'text',   label: 'Texto',  def: '#ffffff' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        setAny(q, ['title','question'], vals.title);
+        q.set('a', vals.a); q.set('b', vals.b); q.set('c', vals.c); q.set('d', vals.d);
+        q.set('domain', domain);
+        return q;
+      },
+      resetWords: () => `A,B,C,D`
+    },
+
+    {
+      cat: 'quizz',
+      id: 'quizz2_kappa',
+      name: 'Quizz 2 (Kappa) — 2 opções',
+      desc: 'Variação 2 opções (Kappa).',
+      baseUrl: 'https://quizz2-kappa.vercel.app/',
+      tags: ['A/B', 'quizz', 'wordcloud'],
+      params: [
+        { key: 'title', label: 'Pergunta', type: 'text', def: 'Qual escolhes?' },
+        { key: 'a', label: 'Resposta A', type: 'text', def: 'Opção A' },
+        { key: 'b', label: 'Resposta B', type: 'text', def: 'Opção B' },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#f59e0b' },
+        { key: 'text',   label: 'Texto',  def: '#ffffff' },
+        { key: 'track',  label: 'Track',  def: '#1b2335' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        setAny(q, ['title','question'], vals.title);
+        q.set('a', vals.a); q.set('b', vals.b);
+        q.set('domain', domain);
+        return q;
+      },
+      resetWords: () => `A,B`
+    },
+
+    {
+      cat: 'quizz',
+      id: 'quizz4_beta',
+      name: 'Quizz 4 (Beta) — 4 opções',
+      desc: 'Nota: esta versão usa "title" (não "question").',
       baseUrl: 'https://quizz4-beta.vercel.app/',
       tags: ['A/B/C/D', 'barras', 'wordcloud'],
       params: [
@@ -453,74 +637,79 @@
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#f59e0b' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'text',   label: 'Texto',  def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
         q.set('title', vals.title);
-        q.set('a', vals.a);
-        q.set('b', vals.b);
-        q.set('c', vals.c);
-        q.set('d', vals.d);
+        q.set('a', vals.a); q.set('b', vals.b); q.set('c', vals.c); q.set('d', vals.d);
         q.set('domain', domain);
         return q;
       },
       resetWords: () => `A,B,C,D`
     },
 
-    // -------------------------
-    // CHAT / ETC
-    // -------------------------
     {
-      id: 'question_and_comments',
-      name: 'Pergunta + Comentários (mural vertical)',
-      desc: 'Mostra pergunta e comentários em tempo real. Lê via wordcloud.',
-      baseUrl: 'https://questionandcomments.vercel.app/',
-      tags: ['chat', 'mural', 'wordcloud'],
+      cat: 'quizz',
+      id: 'balanca_wheat',
+      name: 'Balança (A vs B)',
+      desc: 'Balança de decisão. Esta overlay usa params "title", "left", "right".',
+      baseUrl: 'https://balanca-wheat.vercel.app/',
+      tags: ['A/B', 'balança', 'wordcloud'],
       params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Escreve no chat…' },
+        { key: 'title', label: 'Título', type: 'text', def: 'Balança de Decisão' },
+        { key: 'left',  label: 'Texto Esquerda (A)', type: 'text', def: 'Opção A' },
+        { key: 'right', label: 'Texto Direita (B)', type: 'text', def: 'Opção B' },
       ],
       colorParams: [
-        { key: 'gradient', label: 'Gradiente', def: '#0b0f1a' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        q.set('question', vals.question);
-        q.set('domain', domain);
-        return q;
-      }
-    },
-
-    {
-      id: 'palavra_secreta',
-      name: 'Palavra Secreta (forca leve)',
-      desc: 'Traços + revela letras quando aparecem nos comentários. Lê via wordcloud.',
-      baseUrl: 'https://palavra-secreta-sage.vercel.app/',
-      tags: ['puzzle', 'wordcloud'],
-      params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Palavra Secreta' },
-        { key: 'word', label: 'Palavra', type: 'text', def: 'LIDERANCA' },
-        { key: 'tries', label: 'Tentativas', type: 'number', def: '8' },
-      ],
-      colorParams: [
-        { key: 'accent', label: 'Accent', def: '#60a5fa' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'aColor', label: 'Cor A', def: '#f59e0b' },
+        { key: 'bColor', label: 'Cor B', def: '#60a5fa' },
+        { key: 'text',   label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
         q.set('title', vals.title);
-        q.set('word', vals.word);
-        q.set('tries', vals.tries);
+        q.set('left', vals.left);
+        q.set('right', vals.right);
+        q.set('domain', domain);
+        return q;
+      },
+      resetWords: () => `A,B`
+    },
+
+    // =======================
+    // ENERGIA & DINÂMICA
+    // =======================
+    {
+      cat: 'dinamica',
+      id: 'medidor_energia',
+      name: 'Medidor de Energia da Live',
+      desc: 'Barra que cresce com comentários.',
+      baseUrl: 'https://medidor-energia.vercel.app/',
+      tags: ['energia', 'barra', 'wordcloud'],
+      params: [
+        { key: 'title', label: 'Título', type: 'text', def: 'Energia da Live' },
+        { key: 'max', label: 'Comentários para encher', type: 'number', def: '120' },
+      ],
+      colorParams: [
+        { key: 'fill',  label: 'Barra (fill)', def: '#f59e0b' },
+        { key: 'track', label: 'Track', def: '#1b2335' },
+        { key: 'text',  label: 'Texto', def: '#ffffff' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        setAny(q, ['title'], vals.title);
+        q.set('max', vals.max);
         q.set('domain', domain);
         return q;
       }
     },
 
     {
-      id: 'delay_game',
-      name: 'Delay vs Orador (jogo do delay)',
-      desc: 'Frases divertidas enquanto o chat chega (delay). Lê via wordcloud.',
+      cat: 'dinamica',
+      id: 'delay_omega',
+      name: 'Delay vs Orador',
+      desc: 'Frases divertidas enquanto o chat chega (delay).',
       baseUrl: 'https://delay-omega.vercel.app/',
       tags: ['humor', 'delay', 'wordcloud'],
       params: [
@@ -529,7 +718,7 @@
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#f59e0b' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'text',   label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
@@ -541,153 +730,65 @@
     },
 
     {
-      id: 'url_six',
-      name: 'Website / URL (cartão animado)',
-      desc: 'Overlay para divulgar um link (callout).',
-      baseUrl: 'https://url-six-ruddy.vercel.app/',
-      tags: ['URL', 'callout'],
+      cat: 'dinamica',
+      id: 'emojis_sage',
+      name: 'Emojis (reacções)',
+      desc: 'Reacções por emojis via chat/wordcloud.',
+      baseUrl: 'https://emojis-sage.vercel.app/',
+      tags: ['emoji', 'reacções', 'wordcloud'],
       params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Vai ao site' },
-        { key: 'url', label: 'URL', type: 'text', def: 'https://teusite.com' },
+        { key: 'title', label: 'Título (se suportar)', type: 'text', def: 'Reacções' },
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#60a5fa' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'text',   label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('url', vals.url);
+        // manda os dois para cobrir implementações diferentes
+        setAny(q, ['title','question'], vals.title);
         q.set('domain', domain);
         return q;
       }
     },
 
+    // =======================
+    // JOGOS & CRIATIVO
+    // =======================
     {
-      id: 'medidor_energia',
-      name: 'Medidor de Energia da Live',
-      desc: 'Barra de energia que cresce com comentários. Lê via wordcloud.',
-      baseUrl: 'https://medidor-energia.vercel.app/',
-      tags: ['energia', 'barra', 'wordcloud'],
+      cat: 'jogos',
+      id: 'palavra_secreta',
+      name: 'Palavra Secreta',
+      desc: 'Traços + revela letras quando aparecem nos comentários.',
+      baseUrl: 'https://palavra-secreta-sage.vercel.app/',
+      tags: ['puzzle', 'wordcloud'],
       params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Energia da Live' },
-        { key: 'max', label: 'Comentários para encher', type: 'number', def: '120' },
-      ],
-      colorParams: [
-        { key: 'fill', label: 'Barra (fill)', def: '#f59e0b' },
-        { key: 'track', label: 'Track', def: '#1b2335' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('max', vals.max);
-        q.set('domain', domain);
-        return q;
-      }
-    },
-
-    // -------------------------
-    // BALANÇA (CORRIGIDA)
-    // -------------------------
-    {
-      id: 'balanca_wheat',
-      name: 'Balança (A vs B)',
-      desc: 'Balança de decisão. ESTE overlay lê: title / left / right (não question/optionA/optionB). Votos: "a" e "b".',
-      baseUrl: 'https://balanca-wheat.vercel.app/',
-      tags: ['A/B', 'balança', 'wordcloud'],
-      params: [
-        { key: 'title', label: 'Título', type: 'text', def: 'Balança de Decisão' },
-        { key: 'left', label: 'Texto Esquerda', type: 'text', def: 'Opção A' },
-        { key: 'right', label: 'Texto Direita', type: 'text', def: 'Opção B' },
-      ],
-      colorParams: [
-        { key: 'aColor', label: 'Cor A', def: '#f59e0b' },
-        { key: 'bColor', label: 'Cor B', def: '#60a5fa' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        q.set('title', vals.title);
-        q.set('left', vals.left);
-        q.set('right', vals.right);
-        q.set('domain', domain);
-        return q;
-      },
-      resetWords: () => `a,b,A,B`
-    },
-
-    // -------------------------
-    // LOWER THIRDS / BULLETS
-    // -------------------------
-    {
-      id: 'nome_e_avatar',
-      name: 'Lower Third (Nome + Avatar)',
-      desc: 'Lower third com avatar via URL. Tema e cores por querystring.',
-      baseUrl: 'https://nomeeavatar.vercel.app/',
-      tags: ['lower third', 'nome', 'avatar'],
-      params: [
-        { key: 'name', label: 'Nome', type: 'text', def: 'Tiago Gonçalves' },
-        { key: 'role', label: 'Cargo (opcional)', type: 'text', def: 'Host | Partícula Influente' },
-        { key: 'avatar', label: 'Avatar (URL direta)', type: 'text', def: '' },
-        { key: 'align', label: 'Alinhamento', type: 'select', def: 'left', options: ['left','center','right'] },
-        { key: 'theme', label: 'Tema', type: 'select', def: 'blue', options: ['blue','orange','purple','mint'] },
-        { key: 'duration', label: 'Auto-hide (segundos, 0=fixo)', type: 'number', def: '0' },
-        { key: 'show', label: 'Mostrar (1/0)', type: 'select', def: '1', options: ['1','0'] },
+        { key: 'title', label: 'Título', type: 'text', def: 'Palavra Secreta' },
+        { key: 'word',  label: 'Palavra', type: 'text', def: 'LIDERANCA' },
+        { key: 'tries', label: 'Tentativas', type: 'number', def: '8' },
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#60a5fa' },
-        { key: 'bg', label: 'Fundo', def: '#0b0f1a' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'text',   label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        q.set('name', vals.name);
-        if (vals.role) q.set('role', vals.role);
-        if (vals.avatar) q.set('avatar', vals.avatar);
-        q.set('align', vals.align);
-        q.set('theme', vals.theme);
-        q.set('duration', vals.duration);
-        q.set('show', vals.show);
+        q.set('title', vals.title);
+        q.set('word', vals.word);
+        q.set('tries', vals.tries);
         q.set('domain', domain);
         return q;
       }
     },
 
+    // =======================
+    // CONTEÚDO & ESTRUTURA
+    // =======================
     {
-      id: 'nome_red',
-      name: 'Lower Third (Nome) — versão Red',
-      desc: 'Versão simples focada no nome. Fundo transparente.',
-      baseUrl: 'https://nome-red.vercel.app/',
-      tags: ['lower third', 'nome'],
-      params: [
-        { key: 'name', label: 'Nome', type: 'text', def: 'Tiago Gonçalves' },
-        { key: 'role', label: 'Cargo (opcional)', type: 'text', def: '' },
-        { key: 'align', label: 'Alinhamento', type: 'select', def: 'left', options: ['left','center','right'] },
-        { key: 'duration', label: 'Auto-hide (segundos, 0=fixo)', type: 'number', def: '0' },
-        { key: 'show', label: 'Mostrar (1/0)', type: 'select', def: '1', options: ['1','0'] },
-      ],
-      colorParams: [
-        { key: 'accent', label: 'Accent', def: '#ef4444' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
-        { key: 'bg', label: 'Fundo', def: '#0b0f1a' },
-      ],
-      build: (vals, domain) => {
-        const q = new URLSearchParams();
-        q.set('name', vals.name);
-        if (vals.role) q.set('role', vals.role);
-        q.set('align', vals.align);
-        q.set('duration', vals.duration);
-        q.set('show', vals.show);
-        q.set('domain', domain);
-        return q;
-      }
-    },
-
-    {
+      cat: 'estrutura',
       id: 'bullets_dock_10',
       name: 'Bullet Points (Dock) — até 10 pontos',
-      desc: 'Lista em modo dock. Aceita item1…item10. Sem agenda/footer.',
+      desc: 'Lista em modo dock. Aceita item1…item10. Se estiver vazio, não aparece.',
       baseUrl: 'https://bulletpoints.vercel.app/',
       tags: ['bullets', 'dock', 'OBS'],
       params: [
@@ -706,7 +807,7 @@
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#f59e0b' },
-        { key: 'text', label: 'Texto', def: '#ffffff' },
+        { key: 'text',   label: 'Texto', def: '#ffffff' },
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
@@ -722,9 +823,10 @@
     },
 
     {
+      cat: 'estrutura',
       id: 'single_point_active',
       name: 'Single Bullet (ponto único)',
-      desc: 'Mostra apenas 1 ponto em destaque.',
+      desc: 'Mostra 1 ponto em destaque. A página envia aliases (text/point/item1) para garantir compatibilidade.',
       baseUrl: 'https://singlepoint.vercel.app/',
       tags: ['single', 'bullet', 'OBS'],
       params: [
@@ -733,15 +835,113 @@
         { key: 'speed', label: 'Velocidade (0.4-2)', type: 'number', def: '1' }
       ],
       colorParams: [
-        { key: 'accent', label: 'Accent', def: '#f59e0b' },
-        { key: 'textColor', label: 'Texto', def: '#ffffff' },
-        { key: 'bg', label: 'Fundo', def: '#0b0f1a' }
+        { key: 'accent',   label: 'Accent', def: '#f59e0b' },
+        { key: 'textColor',label: 'Texto', def: '#ffffff' },
+        { key: 'bg',       label: 'Fundo', def: '#0b0f1a' }
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        q.set('text', vals.text);
+        // aliases para cobrir implementações diferentes
+        setAny(q, ['text','point','item1','title'], vals.text);
         if (vals.dock) q.set('dock', vals.dock);
         if (vals.speed) q.set('speed', vals.speed);
+        q.set('domain', domain);
+        return q;
+      }
+    },
+
+    // =======================
+    // BRANDING & INFO
+    // =======================
+    {
+      cat: 'branding',
+      id: 'url_six',
+      name: 'Website / URL (cartão animado)',
+      desc: 'Cartão com título + URL. A página envia aliases para garantir que o título/cores são apanhados.',
+      baseUrl: 'https://url-six-ruddy.vercel.app/',
+      tags: ['URL', 'callout'],
+      params: [
+        { key: 'title', label: 'Título', type: 'text', def: 'Vai ao site' },
+        { key: 'url',   label: 'URL', type: 'text', def: 'https://teusite.com' },
+        { key: 'icon',  label: 'Ícone (emoji/opcional)', type: 'text', def: '🌐' },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#60a5fa' },
+        { key: 'text',   label: 'Texto', def: '#ffffff' },
+        { key: 'bg',     label: 'Fundo', def: '#0b0f1a' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        // aliases (caso a overlay use outros nomes)
+        setAny(q, ['title','text','label','heading'], vals.title);
+        setAny(q, ['url','link','href'], vals.url);
+        setAny(q, ['icon','emoji'], vals.icon);
+        q.set('domain', domain);
+        return q;
+      }
+    },
+
+    {
+      cat: 'branding',
+      id: 'nome_e_avatar',
+      name: 'Lower Third (Nome + Avatar)',
+      desc: 'Lower third com avatar via URL. Tema e cores por querystring.',
+      baseUrl: 'https://nomeeavatar.vercel.app/',
+      tags: ['lower third', 'nome', 'avatar'],
+      params: [
+        { key: 'name', label: 'Nome', type: 'text', def: 'Tiago Gonçalves' },
+        { key: 'role', label: 'Cargo (opcional)', type: 'text', def: 'Host | Partícula Influente' },
+        { key: 'avatar', label: 'Avatar (URL direta)', type: 'text', def: '' },
+        { key: 'align', label: 'Alinhamento', type: 'select', def: 'left', options: ['left','center','right'] },
+        { key: 'theme', label: 'Tema', type: 'select', def: 'blue', options: ['blue','orange','purple','mint'] },
+        { key: 'duration', label: 'Auto-hide (segundos, 0=fixo)', type: 'number', def: '0' },
+        { key: 'show', label: 'Mostrar (1/0)', type: 'select', def: '1', options: ['1','0'] },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#60a5fa' },
+        { key: 'bg',     label: 'Fundo', def: '#0b0f1a' },
+        { key: 'text',   label: 'Texto', def: '#ffffff' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        q.set('name', vals.name);
+        if (vals.role) q.set('role', vals.role);
+        if (vals.avatar) q.set('avatar', vals.avatar);
+        q.set('align', vals.align);
+        q.set('theme', vals.theme);
+        q.set('duration', vals.duration);
+        q.set('show', vals.show);
+        q.set('domain', domain);
+        return q;
+      }
+    },
+
+    {
+      cat: 'branding',
+      id: 'nome_red',
+      name: 'Lower Third (Nome) — versão Red',
+      desc: 'Versão simples focada no nome.',
+      baseUrl: 'https://nome-red.vercel.app/',
+      tags: ['lower third', 'nome'],
+      params: [
+        { key: 'name', label: 'Nome', type: 'text', def: 'Tiago Gonçalves' },
+        { key: 'role', label: 'Cargo (opcional)', type: 'text', def: '' },
+        { key: 'align', label: 'Alinhamento', type: 'select', def: 'left', options: ['left','center','right'] },
+        { key: 'duration', label: 'Auto-hide (segundos, 0=fixo)', type: 'number', def: '0' },
+        { key: 'show', label: 'Mostrar (1/0)', type: 'select', def: '1', options: ['1','0'] },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Accent', def: '#ef4444' },
+        { key: 'text',   label: 'Texto', def: '#ffffff' },
+        { key: 'bg',     label: 'Fundo', def: '#0b0f1a' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        q.set('name', vals.name);
+        if (vals.role) q.set('role', vals.role);
+        q.set('align', vals.align);
+        q.set('duration', vals.duration);
+        q.set('show', vals.show);
         q.set('domain', domain);
         return q;
       }
@@ -749,7 +949,7 @@
   ];
 
   // ----------------------
-  // Smoke tests
+  // Smoke tests (runtime)
   // ----------------------
   (function runSmokeTests(){
     try {
@@ -763,7 +963,8 @@
     }
   })();
 
-  const $list = document.getElementById('list');
+  const $sections = document.getElementById('sections');
+  const $nav = document.getElementById('nav');
   const $domain = document.getElementById('domain');
   const $toast = document.getElementById('toast');
 
@@ -855,6 +1056,7 @@
     const inputs = {};
     const colorInputs = {};
 
+    // Base URL editável
     const baseField = el('div', { class: 'field' }, [
       el('label', { text: 'Base URL (podes trocar para o teu domínio)' }),
     ]);
@@ -863,6 +1065,7 @@
     baseField.appendChild(baseInput);
     form.appendChild(baseField);
 
+    // Campos normais
     (anim.params || []).forEach(p => {
       const field = el('div', { class: 'field' }, [ el('label', { text: p.label }) ]);
 
@@ -880,10 +1083,11 @@
       form.appendChild(field);
     });
 
+    // Secção CORES (se existir)
     let colorsBlock = null;
     if (Array.isArray(anim.colorParams) && anim.colorParams.length){
       colorsBlock = el('div', {}, [
-        el('div', { class: 'sectionTitle', text: 'Cores (querystring)' })
+        el('div', { class: 'sectionMini', text: 'Cores (querystring)' })
       ]);
 
       const grid = el('div', { class: 'colorGrid' });
@@ -938,7 +1142,7 @@
     const preview = el('div', { class: 'preview' });
     const pbar = el('div', { class: 'bar' }, [
       el('div', { class: 'left', html: '<span>Preview</span><span style="opacity:.65">(ajusta a escala no OBS se precisares)</span>' }),
-      el('div', { class: 'right', html: '<span style="opacity:.65">Fundo transparente (se a overlay suportar)</span>' })
+      el('div', { class: 'right', html: '<span style="opacity:.65">Fundo transparente</span>' })
     ]);
 
     const stageWrap = el('div', { class: 'stageWrap' });
@@ -981,11 +1185,13 @@
       return { url, domain, vals };
     }
 
+    // eventos
     Object.values(inputs).forEach(i => i.addEventListener('input', compute));
     $domain.addEventListener('input', compute);
 
     selSize.addEventListener('change', () => {
-      stageWrap.classList.toggle('r169', selSize.value === '16x9');
+      const v = selSize.value;
+      stageWrap.classList.toggle('r169', v === '16x9');
     });
 
     btnCopy.addEventListener('click', async () => {
@@ -1038,7 +1244,7 @@
       toast(res.via === 'fetch' ? 'Reset feito ✅' : 'Reset aberto (tab) ✅');
     });
 
-    const hint = el('div', { class: 'hint', html: 'Nota: se a overlay não suportar certos params, ela ignora. Para overlays novas, confirma os nomes exactos dos params.' });
+    const hint = el('div', { class: 'hint', html: 'Nota: se a overlay <i>não</i> suportar certos parâmetros (cores/aliases), ela ignora. Se alguma ainda não “assumir”, diz-me qual e eu ajusto o mapeamento.' });
 
     const children = [ top, form ];
     if (colorsBlock) children.push(colorsBlock);
@@ -1050,7 +1256,41 @@
     return card;
   }
 
-  ANIMS.forEach(a => $list.appendChild(buildCard(a)));
+  function renderNav(){
+    $nav.innerHTML = '';
+    CATS.forEach(c => {
+      const a = el('a', { href: `#${c.id}` }, [
+        el('span', { class:'dot' }),
+        el('span', { text: c.title })
+      ]);
+      $nav.appendChild(a);
+    });
+  }
+
+  function renderSections(){
+    $sections.innerHTML = '';
+
+    CATS.forEach(cat => {
+      const items = ANIMS.filter(a => a.cat === cat.id);
+      if (!items.length) return;
+
+      const head = el('div', { class:'sectionHead' }, [
+        el('div', {}, [
+          el('h3', { class:'sectionTitle', html: `${cat.title} <span class="badge">${cat.badge}</span>` }),
+          el('p', { class:'sectionDesc', text: cat.desc })
+        ])
+      ]);
+
+      const grid = el('div', { class:'wrap' });
+      items.forEach(a => grid.appendChild(buildCard(a)));
+
+      const section = el('section', { class:'section', id: cat.id }, [ head, grid ]);
+      $sections.appendChild(section);
+    });
+  }
+
+  renderNav();
+  renderSections();
 </script>
 
 </body>
