@@ -58,7 +58,6 @@
       font-size: 13px;
     }
 
-    /* GRID 2 COLUNAS */
     .wrap{
       max-width: 1320px;
       margin: 0 auto;
@@ -223,7 +222,6 @@
     .out .label{ font-size: 12px; color: var(--muted); margin-bottom: 6px; }
     .out .url{ font-size: 13px; word-break: break-all; line-height: 1.35; }
 
-    /* PREVIEW dentro do card */
     .preview{
       border: 1px solid rgba(255,255,255,0.14);
       background: rgba(0,0,0,0.22);
@@ -287,7 +285,11 @@
 <header>
   <div>
     <h1>Página de Testes de Overlays (OBS)</h1>
-    <div class="sub">Escolhe uma animação, preenche os campos e copia o link final. Também podes injectar parâmetros de cor (quando fizer sentido) sem mexer no código da overlay.</div>
+    <div class="sub">
+      Escolhe uma animação, preenche os campos e copia o link final.
+      O “Domain” é o servidor do Social Stream Ninja/wordcloud (ex: localhost:3900).
+      Usa “Reset wordcloud” para limpar votos/entradas.
+    </div>
   </div>
 
   <div class="pill">
@@ -303,22 +305,24 @@
 <script>
   // =========================
   // Página de Testes (OBS)
-  // - Gera links com querystring
-  // - Preview responsivo dentro do card
-  // - Reset wordcloud via /clear-chat
-  // - CORES: injeta params no URL (accent/bg/text etc.)
   // =========================
 
   const ANIMS = [
+    // -------------------------
+    // VOTAÇÕES
+    // -------------------------
     {
-      id: 'votacao_ao_vivo_sim_nao',
-      name: 'Votação ao Vivo (Sim / Não) — amCharts',
-      desc: 'Gráfico circular (amCharts) para Sim/Não. Lê via wordcloud.',
+      id: 'votacao_ao_vivo_sim_nao_donut',
+      name: 'Votação ao Vivo (Sim / Não) — donut',
+      desc: 'Donut (1 roda, 2 opções). Params: yes/no (+ opcional title). Lê via wordcloud.',
       baseUrl: 'https://votacao-ao-vivo.vercel.app/',
-      tags: ['Sim/Não', 'amCharts', 'wordcloud'],
+      tags: ['Sim/Não', 'donut', 'wordcloud'],
       params: [
+        { key: 'title', label: 'Título (opcional)', type: 'text', def: '' },
         { key: 'yes', label: 'Texto Sim', type: 'text', def: 'Sim' },
         { key: 'no', label: 'Texto Não', type: 'text', def: 'Não' },
+        { key: 'yesWords', label: 'Sinónimos Sim (csv opcional)', type: 'text', def: '' },
+        { key: 'noWords', label: 'Sinónimos Não (csv opcional)', type: 'text', def: '' },
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#60a5fa' },
@@ -326,8 +330,11 @@
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
+        if (vals.title) q.set('title', vals.title);
         q.set('yes', vals.yes);
         q.set('no', vals.no);
+        if (vals.yesWords) q.set('yesWords', vals.yesWords);
+        if (vals.noWords) q.set('noWords', vals.noWords);
         q.set('domain', domain);
         return q;
       },
@@ -335,9 +342,39 @@
     },
 
     {
+      id: 'votacao_circular_transparente_nova',
+      name: 'Votação Circular (nova) — transparente (Sim/Não)',
+      desc: 'Só o donut + contagens (sem fundo). Substitui baseUrl quando estiver publicada.',
+      baseUrl: 'https://TODO-SEU-URL.vercel.app/',
+      tags: ['Sim/Não', 'donut', 'transparente', 'wordcloud'],
+      params: [
+        { key: 'yes', label: 'Texto Sim', type: 'text', def: 'Sim' },
+        { key: 'no', label: 'Texto Não', type: 'text', def: 'Não' },
+        { key: 'yesWords', label: 'Sinónimos Sim (csv opcional)', type: 'text', def: '' },
+        { key: 'noWords', label: 'Sinónimos Não (csv opcional)', type: 'text', def: '' },
+      ],
+      colorParams: [
+        { key: 'accent', label: 'Cor Sim (accent)', def: '#22c55e' },
+        { key: 'noColor', label: 'Cor Não', def: '#ef4444' },
+        { key: 'track', label: 'Track', def: '#ffffff' },
+        { key: 'text', label: 'Texto', def: '#ffffff' },
+      ],
+      build: (vals, domain) => {
+        const q = new URLSearchParams();
+        q.set('yes', vals.yes);
+        q.set('no', vals.no);
+        if (vals.yesWords) q.set('yesWords', vals.yesWords);
+        if (vals.noWords) q.set('noWords', vals.noWords);
+        q.set('domain', domain);
+        return q;
+      },
+      resetWords: () => `Sim,Não,A,B`
+    },
+
+    {
       id: 'votacoes_poll4_abcd',
-      name: 'Votações (A/B/C/D) — contadores + barras',
-      desc: 'Poll 4 opções. Pergunta + opções no URL. Lê via wordcloud (A,B,C,D).',
+      name: 'Votações (A/B/C/D) — contadores + barras (vertical)',
+      desc: 'Poll 4 opções (A/B/C/D). Params: title,a,b,c,d. Lê via wordcloud (A,B,C,D).',
       baseUrl: 'https://votacoes.vercel.app/',
       tags: ['A/B/C/D', 'barras', 'wordcloud'],
       params: [
@@ -346,6 +383,7 @@
         { key: 'b', label: 'Opção B', type: 'text', def: 'Opção B' },
         { key: 'c', label: 'Opção C', type: 'text', def: 'Opção C' },
         { key: 'd', label: 'Opção D', type: 'text', def: 'Opção D' },
+        { key: 'leader', label: 'Modo líder (1/0)', type: 'select', def: '1', options: ['1','0'] },
       ],
       colorParams: [
         { key: 'accent', label: 'Accent', def: '#60a5fa' },
@@ -359,16 +397,20 @@
         q.set('b', vals.b);
         q.set('c', vals.c);
         q.set('d', vals.d);
+        if (vals.leader) q.set('leader', vals.leader);
         q.set('domain', domain);
         return q;
       },
       resetWords: () => `A,B,C,D`
     },
 
+    // -------------------------
+    // QUIZZES
+    // -------------------------
     {
       id: 'quizz_relampago_2op',
       name: 'Quizz Relâmpago (2 opções)',
-      desc: 'Pergunta + 2 respostas com contagem e barras. Aceita votos A/B. Lê via wordcloud.',
+      desc: 'Pergunta + 2 respostas. Aceita votos A/B (ou keyA/keyB). Lê via wordcloud.',
       baseUrl: 'https://quizz-relampago.vercel.app/',
       tags: ['A/B', 'barras', 'wordcloud'],
       params: [
@@ -398,8 +440,8 @@
 
     {
       id: 'quizz4_4op',
-      name: 'Quizz (4 opções)',
-      desc: 'Pergunta + 4 respostas com contagem. Aceita votos A/B/C/D. Lê via wordcloud. (Nota: esta versão usa "title", não "question".)',
+      name: 'Quizz (4 opções) — beta',
+      desc: 'Pergunta + 4 respostas. Esta versão usa "title" (não "question"). Lê A/B/C/D via wordcloud.',
       baseUrl: 'https://quizz4-beta.vercel.app/',
       tags: ['A/B/C/D', 'barras', 'wordcloud'],
       params: [
@@ -426,6 +468,9 @@
       resetWords: () => `A,B,C,D`
     },
 
+    // -------------------------
+    // CHAT / ETC
+    // -------------------------
     {
       id: 'question_and_comments',
       name: 'Pergunta + Comentários (mural vertical)',
@@ -542,17 +587,19 @@
       }
     },
 
+    // -------------------------
+    // BALANÇA (CORRIGIDA)
+    // -------------------------
     {
       id: 'balanca_wheat',
       name: 'Balança (A vs B)',
-      desc: 'Balança de decisão A/B. Lê via wordcloud.',
+      desc: 'Balança de decisão. ESTE overlay lê: title / left / right (não question/optionA/optionB). Votos: "a" e "b".',
       baseUrl: 'https://balanca-wheat.vercel.app/',
       tags: ['A/B', 'balança', 'wordcloud'],
       params: [
-        { key: 'question', label: 'Pergunta', type: 'text', def: 'Balança de Decisão' },
-        { key: 'optionA', label: 'Opção A', type: 'text', def: 'Opção A' },
-        { key: 'optionB', label: 'Opção B', type: 'text', def: 'Opção B' },
-        { key: 'align', label: 'Alinhamento', type: 'text', def: 'bottom' },
+        { key: 'title', label: 'Título', type: 'text', def: 'Balança de Decisão' },
+        { key: 'left', label: 'Texto Esquerda', type: 'text', def: 'Opção A' },
+        { key: 'right', label: 'Texto Direita', type: 'text', def: 'Opção B' },
       ],
       colorParams: [
         { key: 'aColor', label: 'Cor A', def: '#f59e0b' },
@@ -561,16 +608,18 @@
       ],
       build: (vals, domain) => {
         const q = new URLSearchParams();
-        q.set('question', vals.question);
-        q.set('optionA', vals.optionA);
-        q.set('optionB', vals.optionB);
-        q.set('align', vals.align);
+        q.set('title', vals.title);
+        q.set('left', vals.left);
+        q.set('right', vals.right);
         q.set('domain', domain);
         return q;
       },
-      resetWords: () => `A,B`
+      resetWords: () => `a,b,A,B`
     },
 
+    // -------------------------
+    // LOWER THIRDS / BULLETS
+    // -------------------------
     {
       id: 'nome_e_avatar',
       name: 'Lower Third (Nome + Avatar)',
@@ -638,7 +687,7 @@
     {
       id: 'bullets_dock_10',
       name: 'Bullet Points (Dock) — até 10 pontos',
-      desc: 'Lista em modo dock. Aceita item1…item10. Se estiver vazio, não aparece. Sem agenda/footer.',
+      desc: 'Lista em modo dock. Aceita item1…item10. Sem agenda/footer.',
       baseUrl: 'https://bulletpoints.vercel.app/',
       tags: ['bullets', 'dock', 'OBS'],
       params: [
@@ -675,7 +724,7 @@
     {
       id: 'single_point_active',
       name: 'Single Bullet (ponto único)',
-      desc: 'Mostra apenas 1 ponto em destaque. Ideal para “tema do momento”.',
+      desc: 'Mostra apenas 1 ponto em destaque.',
       baseUrl: 'https://singlepoint.vercel.app/',
       tags: ['single', 'bullet', 'OBS'],
       params: [
@@ -700,7 +749,7 @@
   ];
 
   // ----------------------
-  // Smoke tests (runtime)
+  // Smoke tests
   // ----------------------
   (function runSmokeTests(){
     try {
@@ -806,7 +855,6 @@
     const inputs = {};
     const colorInputs = {};
 
-    // Base URL editável
     const baseField = el('div', { class: 'field' }, [
       el('label', { text: 'Base URL (podes trocar para o teu domínio)' }),
     ]);
@@ -815,7 +863,6 @@
     baseField.appendChild(baseInput);
     form.appendChild(baseField);
 
-    // Campos normais
     (anim.params || []).forEach(p => {
       const field = el('div', { class: 'field' }, [ el('label', { text: p.label }) ]);
 
@@ -833,7 +880,6 @@
       form.appendChild(field);
     });
 
-    // Secção CORES (se existir)
     let colorsBlock = null;
     if (Array.isArray(anim.colorParams) && anim.colorParams.length){
       colorsBlock = el('div', {}, [
@@ -892,7 +938,7 @@
     const preview = el('div', { class: 'preview' });
     const pbar = el('div', { class: 'bar' }, [
       el('div', { class: 'left', html: '<span>Preview</span><span style="opacity:.65">(ajusta a escala no OBS se precisares)</span>' }),
-      el('div', { class: 'right', html: '<span style="opacity:.65">Fundo transparente</span>' })
+      el('div', { class: 'right', html: '<span style="opacity:.65">Fundo transparente (se a overlay suportar)</span>' })
     ]);
 
     const stageWrap = el('div', { class: 'stageWrap' });
@@ -935,13 +981,11 @@
       return { url, domain, vals };
     }
 
-    // eventos
     Object.values(inputs).forEach(i => i.addEventListener('input', compute));
     $domain.addEventListener('input', compute);
 
     selSize.addEventListener('change', () => {
-      const v = selSize.value;
-      stageWrap.classList.toggle('r169', v === '16x9');
+      stageWrap.classList.toggle('r169', selSize.value === '16x9');
     });
 
     btnCopy.addEventListener('click', async () => {
@@ -994,7 +1038,7 @@
       toast(res.via === 'fetch' ? 'Reset feito ✅' : 'Reset aberto (tab) ✅');
     });
 
-    const hint = el('div', { class: 'hint', html: 'Nota: se a overlay <i>não</i> suportar estes parâmetros de cor, ela ignora. Se me disseres os nomes exactos dos params que cada overlay usa, eu mapeio aqui.' });
+    const hint = el('div', { class: 'hint', html: 'Nota: se a overlay não suportar certos params, ela ignora. Para overlays novas, confirma os nomes exactos dos params.' });
 
     const children = [ top, form ];
     if (colorsBlock) children.push(colorsBlock);
@@ -1006,7 +1050,6 @@
     return card;
   }
 
-  // Render
   ANIMS.forEach(a => $list.appendChild(buildCard(a)));
 </script>
 
